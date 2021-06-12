@@ -26,6 +26,9 @@ public class ServerListener extends Listener {
 
     public ServerListener(MainServer mainServer){
         this.mainServer = mainServer;
+        searchingPlayers = new ArrayList<>();
+        connectionUserNameMapping = new HashMap<>();
+        gameData = new ArrayList<>();
     }
 
 
@@ -43,6 +46,7 @@ public class ServerListener extends Listener {
 
     @Override
     public void received(Connection connection, Object object) {
+        Log.info("Object Received: "+ object.getClass());
         if(object instanceof ClientJoined){
             connectionUserNameMapping.put(connection, ((ClientJoined) object).getUserName());
         } else if(object instanceof FindGame){
