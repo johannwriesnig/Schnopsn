@@ -18,33 +18,19 @@
         app:srcCompat="@drawable/homescreenlogo" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/searchBtn"
         android:layout_width="130dp"
         android:layout_height="55dp"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="176dp"
         android:background="@drawable/roundstylebutton"
         android:backgroundTint="@color/btn_color"
-        android:text="Go"
+        android:text="find
+        game"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.476"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="130dp"
-        android:layout_height="55dp"
-        android:background="@drawable/roundstylebutton"
-        android:backgroundTint="@color/btn_color"
-        android:text="Quit"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button"
-        app:layout_constraintVertical_bias="0.214" />
 </androidx.constraintlayout.widget.ConstraintLayout>

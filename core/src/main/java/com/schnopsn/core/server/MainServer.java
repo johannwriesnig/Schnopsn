@@ -14,7 +14,7 @@ public class MainServer {
 
     public MainServer() throws IOException {
         server = new Server();
-        server.addListener(new ServerListener());
+        server.addListener(new ServerListener(this));
         RegisterHelper.registerClasses(server.getKryo());
         server.start();
         server.bind(NetworkConstants.TCP_PORT);
