@@ -1,5 +1,6 @@
 package com.schnopsn.core.game;
 
+import com.schnopsn.core.game.cards.Card;
 import com.schnopsn.core.game.cards.CollectedDeck;
 import com.schnopsn.core.game.cards.HandDeck;
 
@@ -8,10 +9,13 @@ public class Player {
     private String name;
     private HandDeck handDeck;
     private CollectedDeck collectedDeck;
+    private int bummerl=7;
+
 
     public Player(){
 
     }
+
 
     public int getId() {
         return id;
@@ -44,4 +48,13 @@ public class Player {
     public void setCollectedDeck(CollectedDeck collectedDeck) {
         this.collectedDeck = collectedDeck;
     }
+
+    public int getBummerl() {
+        return bummerl;
+    }
+
+    public void setBummerl(int bummerl) {
+        this.bummerl = bummerl;
+    }
+
 }

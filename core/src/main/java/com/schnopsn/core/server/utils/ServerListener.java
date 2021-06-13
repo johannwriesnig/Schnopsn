@@ -70,17 +70,17 @@ public class ServerListener extends Listener {
     }
 
     public void notifyPair(Connection[] pair){
-        ArrayList<Player> players = new ArrayList<>();
+        Player[] players = new Player[2];
 
         Player player1=new Player();
         player1.setId(pair[0].getID());
         player1.setName(connectionUserNameMapping.get(pair[0]));
-        players.add(player1);
+        players[0]=player1;
 
         Player player2=new Player();
         player2.setId(pair[1].getID());
         player2.setName(connectionUserNameMapping.get(pair[1]));
-        players.add(player2);
+        players[1]=player1;
 
         Game game = new Game(players);
         ServerGameData gameData = new ServerGameData(game, new HashSet<Connection>(Arrays.asList(pair)));

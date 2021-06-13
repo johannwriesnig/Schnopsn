@@ -15,4 +15,12 @@ public class AnsagenTurn extends Turn {
     public CardPair getCardPair() {
         return cardPair;
     }
+
+    public boolean isCallable(){
+        return false;
+    }
+
+    public Card cardToPlay(){
+        return cardPair.getCard1();
+    }
 }
