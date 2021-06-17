@@ -39,18 +39,13 @@ script:
   - yes | sdkmanager "platforms;android-30" # accept licenses
   - yes | sdkmanager "build-tools;30.0.3"   # accept licenses
   - chmod +x gradlew                        # make executable 
-  - ./gradlew test jacocoTestReport
+
 ## uncomment test exec if android integration tests are needed
 #  - ./gradlew connectedAndroidTest
   - ./gradlew lint
 
   - export JAVA_HOME=$HOME/openjdk11        # use java 11 which is needed for sonar
-  - sonar-scanner
 
-addons:
-  sonarcloud:
-    organization: "alexx882-github" # der key der organisation auf sonarcloud.io
-    token: $SONAR_TOKEN # Umgebungsvariable auf travis-ci.com
 
 # benachrichtigungen per email ausschalten
 notifications:
