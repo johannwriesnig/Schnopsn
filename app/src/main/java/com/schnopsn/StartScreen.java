@@ -15,11 +15,6 @@ public class StartScreen extends AppCompatActivity {
 
         Intent intent = new Intent(this, HomeScreen.class);
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(intent);
-            }
-        },3000);
+        handler.postDelayed(() -> startActivity(intent),3000);
     }
 }
