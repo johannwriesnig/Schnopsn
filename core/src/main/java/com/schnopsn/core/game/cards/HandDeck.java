@@ -3,6 +3,8 @@ package com.schnopsn.core.game.cards;
 public class HandDeck {
     private Card[] deck;
 
+    public HandDeck(){}
+
     public HandDeck(Card[] deck){
         this.deck = deck;
     }
@@ -26,5 +28,9 @@ public class HandDeck {
         for(int i=0; i<deck.length;i++){
             if(deck[i]==null)deck[i]=card;
         }
+    }
+
+    public Card[] getDeck() {
+        return deck;
     }
 }

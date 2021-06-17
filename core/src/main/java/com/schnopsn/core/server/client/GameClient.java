@@ -3,6 +3,7 @@ package com.schnopsn.core.server.client;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
 import com.schnopsn.core.game.Game;
+import com.schnopsn.core.server.dto.BaseMessage;
 import com.schnopsn.core.server.dto.clienttoserver.ClientJoined;
 import com.schnopsn.core.server.dto.clienttoserver.FindGame;
 import com.schnopsn.core.server.utils.NetworkConstants;
@@ -17,6 +18,7 @@ public class GameClient {
     private static GameClient instance;
     private Game game;
     private String userName;
+    private GameInitListener gameInitListener;
 
     private GameClient() {
     }
@@ -34,7 +36,7 @@ public class GameClient {
             client = new Client();
             client.start();
             RegisterHelper.registerClasses(client.getKryo());
-            client.addListener(new ClientListener());
+            client.addListener(new ClientListener(this));
             client.connect(5000, NetworkConstants.MAIN_SERVER_IP, NetworkConstants.TCP_PORT);
             sendUserName();
 
@@ -55,6 +57,21 @@ public class GameClient {
 
     public void setGame(Game game) {
         this.game = game;
+        gameInitListener.changeView();
+    }
+
+    public void setGameInitListener(GameInitListener gameInitListener) {
+        this.gameInitListener = gameInitListener;
+    }
+
+    public void sendMessage(final BaseMessage message){
+        Thread thread = new Thread(){
+            @Override
+            public void run() {
+                client.sendTCP(message);
+            }
+        };
+        thread.start();
     }
 
     public void sendUserName(){

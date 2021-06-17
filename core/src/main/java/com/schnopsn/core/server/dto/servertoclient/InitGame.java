@@ -1,4 +1,4 @@
-package com.schnopsn.core.server.dto.clienttoserver;
+package com.schnopsn.core.server.dto.servertoclient;
 
 import com.schnopsn.core.game.Game;
 import com.schnopsn.core.server.dto.BaseMessage;

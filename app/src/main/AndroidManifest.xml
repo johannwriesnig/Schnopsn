@@ -29,6 +29,10 @@
             android:name=".EnterUserNameActivity"
             android:screenOrientation="landscape">
         </activity>
+        <activity
+            android:name=".GameView"
+            android:screenOrientation="landscape">
+        </activity>
     </application>
 
 </manifest>
