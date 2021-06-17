@@ -6,3 +6,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_7
 }
+
+dependencies {
+    implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
+}
