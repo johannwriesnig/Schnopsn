@@ -18,7 +18,7 @@ public class GameView extends AppCompatActivity {
     private Button respond;
     private Game game;
     private Player me;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
