@@ -1,5 +1,10 @@
 package com.schnopsn.core.game.turns;
 
-public class Turn {
+import com.schnopsn.core.game.cards.Card;
+
+public abstract class Turn {
     public Turn(){}
+
+    public abstract Card getPlayedCard();
+
 }

@@ -18,6 +18,7 @@ public class GameClient {
     private static GameClient instance;
     private Game game;
     private String userName;
+    private boolean inGame=false;
     private GameInitListener gameInitListener;
 
     private GameClient() {
@@ -71,7 +72,16 @@ public class GameClient {
                 client.sendTCP(message);
             }
         };
+
         thread.start();
+    }
+
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 
     public void sendUserName(){

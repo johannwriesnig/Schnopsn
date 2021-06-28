@@ -18,4 +18,8 @@ public class DrawDeck {
     public void setDrawDeck(ArrayList<Card> drawDeck) {
         this.drawDeck = drawDeck;
     }
+
+    public Card drawCard(){
+        return drawDeck.remove(0);
+    }
 }

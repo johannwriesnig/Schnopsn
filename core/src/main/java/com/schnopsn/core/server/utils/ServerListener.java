@@ -50,14 +50,13 @@ public class ServerListener extends Listener {
 
     @Override
     public void received(Connection connection, Object object) {
-        Log.info("Object Received: "+ object.getClass());
+        if(!(object instanceof com.esotericsoftware.kryonet.FrameworkMessage)) Log.info("Object Received: "+ object.getClass());
         if(object instanceof ClientJoined){
             connectionUserNameMapping.put(connection, ((ClientJoined) object).getUserName());
         } else if(object instanceof FindGame){
             searchingPlayers.add(connection);
             checkForPairing();
         } else if(object instanceof MakeTurn || object instanceof Respond || object instanceof ChangeCard){
-            Log.info("here");
             ServerGameData gameData = null;
             Player currentPlayer = null;
             for (ServerGameData data : gameDatas) {
@@ -70,11 +69,7 @@ public class ServerListener extends Listener {
                     }
                 }
             }
-            Log.info("here");
-            Log.info(String.valueOf(currentPlayer==null));
-            Log.info(String.valueOf(gameData==null));
             if(gameData==null||currentPlayer==null)return;
-            Log.info("here");
             if(object instanceof MakeTurn){
                 gameData.getGame().makeTurn(currentPlayer,((MakeTurn) object).getTurn());
             } else if(object instanceof Respond){
