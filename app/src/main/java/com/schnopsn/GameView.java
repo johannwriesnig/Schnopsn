@@ -2,6 +2,7 @@ package com.schnopsn;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,10 @@ public class GameView extends AppCompatActivity {
     private Game game;
     private Player me;
 
+    private TextView myTurn;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +39,8 @@ public class GameView extends AppCompatActivity {
             if(player.getId() == GameClient.getInstance().getClient().getID())me = player;
         }
 
+        myTurn = findViewById(R.id.myTurnTextView);
+
         playCard.setOnClickListener(v->playCard());
         changeCard.setOnClickListener(v->changeCard());
         respond.setOnClickListener(v->respond());
@@ -47,20 +54,29 @@ public class GameView extends AppCompatActivity {
 
     public void respond(){
         game.respondOnTurn(me,me.getHandDeck().getDeck()[0]);
-
+        printInfo();
     }
 
     public void changeCard(){
         game.changeCard(me,me.getHandDeck().getDeck()[0]);
+        printInfo();
     }
 
     public void printInfo(){
+        initTextView();
         Log.info("Trumpf: " + game.getTrumpf().getCardColor()+ " / "+ game.getTrumpf().getCardValue());
         Log.info("This is me: " + GameClient.getInstance().getClient().getID());
         Log.info("CurrentPlayer is: " + game.getCurrentPlayer().getId());
         Log.info("MyDeck: ");
         for(Card card: me.getHandDeck().getDeck()){
+            if(card!=null)
             Log.info("Farbe: "+ card.getCardColor()+" / Wert: "+ card.getCardValue());
         }
+    }
+    public void initTextView(){
+        String info;
+        if(GameClient.getInstance().getGame().getCurrentPlayer().getId()==me.getId())info = "It's my turn";
+        else info = "It's the enemies turn";
+        myTurn.setText(info);
     }
 }

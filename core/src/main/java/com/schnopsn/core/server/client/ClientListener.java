@@ -17,11 +17,12 @@ public class ClientListener extends Listener {
 
     @Override
     public void received(Connection connection, Object object) {
-        Log.info("Received Object: " + object.getClass());
+        if(!(object instanceof com.esotericsoftware.kryonet.FrameworkMessage))Log.info("Received Object: " + object.getClass());
         if(object instanceof InitGame){
             Game game = ((InitGame) object).getGame();
             gameClient.setGame(game);
             gameClient.getGame().setGameListener(new GameListenerClientSide(gameClient));
+            gameClient.setInGame(true);
 
         } else if(object instanceof GameUpdate){
             gameClient.getGame().updateGame((GameUpdate) object);

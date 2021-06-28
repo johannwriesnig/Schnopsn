@@ -8,6 +8,11 @@ public class AnsagenTurn extends Turn {
 
     public AnsagenTurn(){}
 
+    @Override
+    public Card getPlayedCard() {
+        return cardPair.getCard1();
+    }
+
     public AnsagenTurn(CardPair cardPair){
         this.cardPair = cardPair;
     }
@@ -20,7 +25,4 @@ public class AnsagenTurn extends Turn {
         return false;
     }
 
-    public Card cardToPlay(){
-        return cardPair.getCard1();
-    }
 }

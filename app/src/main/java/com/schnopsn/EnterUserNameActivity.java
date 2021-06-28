@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ public class EnterUserNameActivity extends AppCompatActivity {
     private AlertDialog.Builder builder;
     private Intent intent;
     private Button goBtn;
+    private TextView userNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +29,16 @@ public class EnterUserNameActivity extends AppCompatActivity {
 
         goBtn = findViewById(R.id.goBtn);
         goBtn.setOnClickListener(v->connectToServer());
-
-
+        userNameTextView = findViewById(R.id.userNameEditText);
     }
 
     public void connectToServer(){
+        String userName = userNameTextView.getText().toString();
+        if (userName.matches("")) {
+            Toast.makeText(this, "Please enter an username", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        GameClient.getInstance().setUserName(userName);
         new InitClientAsyncTask().execute();
     }
 
@@ -47,8 +54,6 @@ public class EnterUserNameActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            TextView textView = findViewById(R.id.userNameEditText);
-            GameClient.getInstance().setUserName(textView.getText().toString());
             GameClient.getInstance().init();
             return "Client initialized";
         }

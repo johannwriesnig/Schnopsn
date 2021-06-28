@@ -45,41 +45,45 @@ public class Game {
     }
 
     public void makeTurn(Player player, Turn turn){
-        Log.info("start making a turn");
         if(gameState!=GameState.AWAITING_TURN||currentPlayer.getId()!=player.getId())return;
-        Log.info("here");
         this.turn = turn;
         if(turn instanceof NormalTurn) {
-            playedCard = ((NormalTurn) turn).getPlayedCard();
+            playedCard = turn.getPlayedCard();
+            Log.info("Turn Card: " + playedCard.getCardColor()+ " / "+ playedCard.getCardValue());
             currentPlayer.getHandDeck().remove(playedCard);
             changeState(GameState.AWAITING_RESPONSE);
         } else if(turn instanceof AnsagenTurn){
             if(!((AnsagenTurn) turn).isCallable())return;
-            if(((AnsagenTurn) turn).cardToPlay().getCardColor()==trumpf.getCardColor())currentPlayer.getCollectedDeck().addCallPoints(40);
+            if(turn.getPlayedCard().getCardColor()==trumpf.getCardColor())currentPlayer.getCollectedDeck().addCallPoints(40);
             else currentPlayer.getCollectedDeck().addCallPoints(20);
-            playedCard = ((AnsagenTurn) turn).cardToPlay();
+            playedCard = turn.getPlayedCard();
             currentPlayer.getHandDeck().remove(playedCard);
             boolean roundIsOver = isRoundOver();
-            if(!roundIsOver)changeState(GameState.AWAITING_TURN);
+            if(!roundIsOver)changeState(GameState.AWAITING_RESPONSE);
         }
-        Log.info("end making a turn");
     }
     public void respondOnTurn(Player player, Card responseCard){
-        Log.info("start making a response");
         if(gameState!=GameState.AWAITING_RESPONSE || currentPlayer.getId()==player.getId()||!player.getHandDeck().contains(responseCard))return;
         playedCard = responseCard;
+        Log.info("Response Card: " + responseCard.getCardColor()+ " / "+ responseCard.getCardValue());
         player.getHandDeck().remove(responseCard);
         boolean playedCardIsHigherThanResponse = playedCardIsHigherThanResponse(responseCard);
-        CardPair cardPair = new CardPair(playedCard, responseCard);
+        CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
         if(playedCardIsHigherThanResponse)player.getCollectedDeck().add(cardPair);
         else {
             currentPlayer.getCollectedDeck().add(cardPair);
             currentPlayer = player;
         }
         boolean roundIsOver = isRoundOver();
-        if(!roundIsOver)changeState(GameState.AWAITING_TURN);
-        Log.info("end making a response");
+        if(!roundIsOver){
+            if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
+            changeState(GameState.AWAITING_TURN);}
 
+    }
+
+    public void drawOneCardEach(){
+        currentPlayer.getHandDeck().add(drawDeck.drawCard());
+        getOtherPlayer(currentPlayer).getHandDeck().add(drawDeck.drawCard());
     }
 
     public boolean isRoundOver(){
@@ -110,7 +114,23 @@ public class Game {
     }
 
     public boolean playedCardIsHigherThanResponse(Card responseCard){
-        return false;
+        boolean isHigher;
+        if(turn.getPlayedCard().getCardColor().equals(trumpf.getCardColor())||responseCard.getCardColor().equals(trumpf.getCardColor())){
+            if(turn.getPlayedCard().getCardColor().equals(trumpf.getCardColor())&&!responseCard.getCardColor().equals(trumpf.getCardColor()))isHigher=true;
+            else if(!turn.getPlayedCard().getCardColor().equals(trumpf.getCardColor())&&responseCard.getCardColor().equals(trumpf.getCardColor()))isHigher=false;
+            else {
+                if(turn.getPlayedCard().getCardValue().getValue()>responseCard.getCardValue().getValue())isHigher=true;
+                else isHigher = false;
+            }
+        } else {
+            if(!turn.getPlayedCard().getCardColor().equals(responseCard.getCardColor()))isHigher=true;
+            else{
+                if(turn.getPlayedCard().getCardValue().getValue()>responseCard.getCardValue().getValue())isHigher=true;
+                else isHigher = false;
+            }
+        }
+        Log.info("Is higher: "+isHigher);
+        return isHigher;
     }
 
     public void changeCard(Player player, Card card){
@@ -140,6 +160,7 @@ public class Game {
         drawDeck = deckBuilder.getDrawDeck();
         trumpf = drawDeck.getDrawDeck().get(drawDeck.getDrawDeck().size()-1);
         changeState(GameState.AWAITING_TURN);
+        Log.info("Trumpf: " + trumpf.getCardColor() + " / " + trumpf.getCardValue());
     }
 
     public Player getOtherPlayer(Player player){
