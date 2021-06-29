@@ -78,7 +78,7 @@ public class HomeScreenActivity extends AppCompatActivity {
 
     public void waitFor7Seconds(){
         try {
-            Thread.sleep(7000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

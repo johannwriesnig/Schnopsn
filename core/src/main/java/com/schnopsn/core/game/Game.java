@@ -23,6 +23,7 @@ public class Game {
     private Card playedCard;
     private Card trumpf;
     private GameListener gameListener;
+    private UpdateListener updateListener;
     private int roundCounter;
 
     public Game(){}
@@ -41,6 +42,7 @@ public class Game {
             gameListener.inform(gameUpdate, this.gameState);
         }
         this.gameState = gameState;
+
         if(gameState==GameState.NEW_ROUND_BEGINS && !(gameListener instanceof GameListenerClientSide))initRound();
     }
 
@@ -51,6 +53,7 @@ public class Game {
             playedCard = turn.getPlayedCard();
             Log.info("Turn Card: " + playedCard.getCardColor()+ " / "+ playedCard.getCardValue());
             currentPlayer.getHandDeck().remove(playedCard);
+            currentPlayer = getOtherPlayer(currentPlayer);
             changeState(GameState.AWAITING_RESPONSE);
         } else if(turn instanceof AnsagenTurn){
             if(!((AnsagenTurn) turn).isCallable())return;
@@ -59,20 +62,23 @@ public class Game {
             playedCard = turn.getPlayedCard();
             currentPlayer.getHandDeck().remove(playedCard);
             boolean roundIsOver = isRoundOver();
+            currentPlayer = getOtherPlayer(currentPlayer);
             if(!roundIsOver)changeState(GameState.AWAITING_RESPONSE);
         }
     }
     public void respondOnTurn(Player player, Card responseCard){
-        if(gameState!=GameState.AWAITING_RESPONSE || currentPlayer.getId()==player.getId()||!player.getHandDeck().contains(responseCard))return;
+        if(gameState!=GameState.AWAITING_RESPONSE || currentPlayer.getId()!=player.getId()||!player.getHandDeck().contains(responseCard))return;
         playedCard = responseCard;
         Log.info("Response Card: " + responseCard.getCardColor()+ " / "+ responseCard.getCardValue());
         player.getHandDeck().remove(responseCard);
         boolean playedCardIsHigherThanResponse = playedCardIsHigherThanResponse(responseCard);
         CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
-        if(playedCardIsHigherThanResponse)player.getCollectedDeck().add(cardPair);
-        else {
+        if(playedCardIsHigherThanResponse){
             currentPlayer.getCollectedDeck().add(cardPair);
-            currentPlayer = player;
+            currentPlayer = getOtherPlayer(currentPlayer);
+        }
+        else {
+            getOtherPlayer(currentPlayer).getCollectedDeck().add(cardPair);
         }
         boolean roundIsOver = isRoundOver();
         if(!roundIsOver){
@@ -182,10 +188,14 @@ public class Game {
         updatePlayers(gameUpdate.getPlayers());
         this.currentPlayer = gameUpdate.getCurrentPlayer();
         this.turn = gameUpdate.getTurn();
-        this.gameState = gameUpdate.getGameState();
         this.drawDeck = gameUpdate.getDrawDeck();
         this.trumpf = gameUpdate.getTrumpf();
         this.playedCard = gameUpdate.getPlayedCard();
+        this.gameState = gameUpdate.getGameState();
+
+        if(updateListener!=null){
+            updateListener.updated(gameUpdate);
+        }
     }
 
     public void updatePlayers(Player[] players){
@@ -197,11 +207,14 @@ public class Game {
                 }
             }
         }
-
     }
 
     public Turn getTurn() {
         return turn;
+    }
+
+    public void setUpdateListener(UpdateListener updateListener) {
+        this.updateListener = updateListener;
     }
 
     public Player getCurrentPlayer() {
