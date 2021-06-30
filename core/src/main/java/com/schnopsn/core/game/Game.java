@@ -6,12 +6,14 @@ import com.schnopsn.core.game.cards.CardValue;
 import com.schnopsn.core.game.cards.CollectedDeck;
 import com.schnopsn.core.game.cards.DeckBuilder;
 import com.schnopsn.core.game.cards.DrawDeck;
+import com.schnopsn.core.game.cards.HandDeck;
 import com.schnopsn.core.game.turns.AnsagenTurn;
 import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.game.turns.Turn;
 import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
 import com.esotericsoftware.minlog.Log;
 
+import java.util.ArrayList;
 
 
 public class Game {
@@ -185,17 +187,20 @@ public class Game {
     }
 
     public void updateGame(GameUpdate gameUpdate){
-        updatePlayers(gameUpdate.getPlayers());
+
+        if(updateListener!=null){
+            ArrayList<HandDeck> oldDecks= new ArrayList<>();
+            oldDecks.add(getCopyOfDeck(currentPlayer));
+            oldDecks.add(getCopyOfDeck(getOtherPlayer(currentPlayer)));
+            updateListener.updated(gameUpdate, oldDecks);
+        }
         this.currentPlayer = gameUpdate.getCurrentPlayer();
+        this.playedCard = gameUpdate.getPlayedCard();
+        updatePlayers(gameUpdate.getPlayers());
         this.turn = gameUpdate.getTurn();
         this.drawDeck = gameUpdate.getDrawDeck();
         this.trumpf = gameUpdate.getTrumpf();
-        this.playedCard = gameUpdate.getPlayedCard();
         this.gameState = gameUpdate.getGameState();
-
-        if(updateListener!=null){
-            updateListener.updated(gameUpdate);
-        }
     }
 
     public void updatePlayers(Player[] players){
@@ -207,6 +212,16 @@ public class Game {
                 }
             }
         }
+    }
+
+    public HandDeck getCopyOfDeck(Player player){
+        HandDeck deckToReturn = new HandDeck(new Card[5]);
+
+        for(Card card: player.getHandDeck().getDeck()){
+            deckToReturn.add(card);
+        }
+
+        return deckToReturn;
     }
 
     public Turn getTurn() {

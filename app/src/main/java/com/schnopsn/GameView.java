@@ -1,6 +1,8 @@
 package com.schnopsn;
 
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +21,8 @@ import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.server.client.GameClient;
 import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
 
+import java.util.ArrayList;
+
 public class GameView extends AppCompatActivity {
     private Button playCard;
     private Button changeCard;
@@ -32,22 +36,35 @@ public class GameView extends AppCompatActivity {
     private ImageView myCard4;
     private ImageView myCard5;
 
-    private ImageView enemyCard1;
-    private ImageView enemyCard2;
-    private ImageView enemyCard3;
-    private ImageView enemyCard4;
-    private ImageView enemyCard5;
+    private ImageView enemyCardBack1;
+    private ImageView enemyCardBack2;
+    private ImageView enemyCardBack3;
+    private ImageView enemyCardBack4;
+    private ImageView enemyCardBack5;
+
+    private ImageView enemyCardFront1;
+    private ImageView enemyCardFront2;
+    private ImageView enemyCardFront3;
+    private ImageView enemyCardFront4;
+    private ImageView enemyCardFront5;
 
     private ImageView myPlayedCard;
-    private ImageView EnemiesPlayedCard;
+    private ImageView enemiesPlayedCard;
+
+    private ImageView myCollectedDeck;
+    private ImageView enemiesCollectedDeck;
 
     private ImageView trumpfCard;
 
     private TextView myStandingsView;
     private TextView enemyStandingsView;
 
+
+
     private int indexPlayedCard;
     private boolean haveToWaitForRespond;
+
+    private GameUpdate gameUp;
 
 
 
@@ -66,14 +83,23 @@ public class GameView extends AppCompatActivity {
         myCard4 = findViewById(R.id.cardImage4);
         myCard5 = findViewById(R.id.cardImage5);
 
-        enemyCard1 = findViewById(R.id.enemyCardImage1);
-        enemyCard2 = findViewById(R.id.enemyCardImage2);
-        enemyCard3 = findViewById(R.id.enemyCardImage3);
-        enemyCard4 = findViewById(R.id.enemyCardImage4);
-        enemyCard5 = findViewById(R.id.enemyCardImage5);
+        enemyCardBack1 = findViewById(R.id.enemyCardImageBack1);
+        enemyCardBack2 = findViewById(R.id.enemyCardImageBack2);
+        enemyCardBack3 = findViewById(R.id.enemyCardImageBack3);
+        enemyCardBack4 = findViewById(R.id.enemyCardImageBack4);
+        enemyCardBack5 = findViewById(R.id.enemyCardImageBack5);
+
+        enemyCardFront1 = findViewById(R.id.enemyCardImageFront1);
+        enemyCardFront2 = findViewById(R.id.enemyCardImageFront2);
+        enemyCardFront3 = findViewById(R.id.enemyCardImageFront3);
+        enemyCardFront4 = findViewById(R.id.enemyCardImageFront4);
+        enemyCardFront5 = findViewById(R.id.enemyCardImageFront5);
 
         myPlayedCard = findViewById((R.id.myPlayedCard));
-        EnemiesPlayedCard = findViewById(R.id.enemiesPlayedCard);
+        enemiesPlayedCard = findViewById(R.id.enemiesPlayedCard);
+
+        myCollectedDeck = findViewById(R.id.myCollectedDeck);
+        enemiesCollectedDeck = findViewById(R.id.enemiesCollectedDeck);
 
         trumpfCard = findViewById(R.id.trumpf);
 
@@ -86,6 +112,7 @@ public class GameView extends AppCompatActivity {
             if(player.getId() == GameClient.getInstance().getClient().getID())me = player;
         }
 
+        setCardHeights();
         initRound();
         setUpCardsDependingOnWhoTurn();
         initStandings();
@@ -100,6 +127,72 @@ public class GameView extends AppCompatActivity {
 
         game.setUpdateListener(new UpdateListenerImpl());
         printInfo();
+    }
+
+    public void setCardHeights(){
+        int imageViewHeight = getHeight();
+
+        myCard1.getLayoutParams().height=imageViewHeight;
+        myCard2.getLayoutParams().height=imageViewHeight;
+        myCard3.getLayoutParams().height=imageViewHeight;
+        myCard4.getLayoutParams().height=imageViewHeight;
+        myCard5.getLayoutParams().height=imageViewHeight;
+
+        enemyCardFront1.getLayoutParams().height=imageViewHeight;
+        enemyCardFront2.getLayoutParams().height=imageViewHeight;
+        enemyCardFront3.getLayoutParams().height=imageViewHeight;
+        enemyCardFront4.getLayoutParams().height=imageViewHeight;
+        enemyCardFront5.getLayoutParams().height=imageViewHeight;
+
+        enemyCardBack1.getLayoutParams().height=imageViewHeight;
+        enemyCardBack2.getLayoutParams().height=imageViewHeight;
+        enemyCardBack3.getLayoutParams().height=imageViewHeight;
+        enemyCardBack4.getLayoutParams().height=imageViewHeight;
+        enemyCardBack5.getLayoutParams().height=imageViewHeight;
+
+        myPlayedCard.getLayoutParams().height=imageViewHeight;
+        enemiesPlayedCard.getLayoutParams().height=imageViewHeight;
+
+        myCollectedDeck.getLayoutParams().height=imageViewHeight;
+        enemiesCollectedDeck.getLayoutParams().height=imageViewHeight;
+
+        requestLayouts();
+
+    }
+
+    public int getHeight(){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int windowWidth = size.x;
+        int windowHeight = size.y;
+        return windowHeight/3-75;
+    }
+
+    public void requestLayouts(){
+        myCard1.requestLayout();
+        myCard2.requestLayout();
+        myCard3.requestLayout();
+        myCard4.requestLayout();
+        myCard5.requestLayout();
+
+        enemyCardFront1.requestLayout();
+        enemyCardFront2.requestLayout();
+        enemyCardFront3.requestLayout();
+        enemyCardFront4.requestLayout();
+        enemyCardFront5.requestLayout();
+
+        enemyCardBack1.requestLayout();
+        enemyCardBack2.requestLayout();
+        enemyCardBack3.requestLayout();
+        enemyCardBack4.requestLayout();
+        enemyCardBack5.requestLayout();
+
+        myPlayedCard.requestLayout();
+        enemiesPlayedCard.requestLayout();
+
+        myCollectedDeck.requestLayout();
+        enemiesCollectedDeck.requestLayout();
     }
 
     public void playCard(){
@@ -125,6 +218,21 @@ public class GameView extends AppCompatActivity {
         setCardImage(myCard3, myDeck.getDeck()[2]);
         setCardImage(myCard4, myDeck.getDeck()[3]);
         setCardImage(myCard5, myDeck.getDeck()[4]);
+
+        HandDeck enemiesDeck = game.getOtherPlayer(me).getHandDeck();
+
+        setCardImage(enemyCardFront1, enemiesDeck.getDeck()[0]);
+        setCardImage(enemyCardFront2, enemiesDeck.getDeck()[1]);
+        setCardImage(enemyCardFront3, enemiesDeck.getDeck()[2]);
+        setCardImage(enemyCardFront4, enemiesDeck.getDeck()[3]);
+        setCardImage(enemyCardFront5, enemiesDeck.getDeck()[4]);
+
+        /*enemyCardFront1.setVisibility(View.INVISIBLE);
+        enemyCardFront2.setVisibility(View.INVISIBLE);
+        enemyCardFront3.setVisibility(View.INVISIBLE);
+        enemyCardFront4.setVisibility(View.INVISIBLE);
+        enemyCardFront5.setVisibility(View.INVISIBLE);*/
+
 
         setCardImage(trumpfCard, game.getTrumpf());
     }
@@ -216,16 +324,16 @@ public class GameView extends AppCompatActivity {
     }
 
     public void setListenerForMyCards(){
-        myCard1.setOnClickListener((View view)->translate(myCard1, myPlayedCard, 0));
-        myCard2.setOnClickListener((View view)->translate(myCard2, myPlayedCard, 1));
-        myCard3.setOnClickListener((View view)->translate(myCard3, myPlayedCard,2));
-        myCard4.setOnClickListener((View view)->translate(myCard4, myPlayedCard,3));
-        myCard5.setOnClickListener((View view)->translate(myCard5, myPlayedCard,4));
+        myCard1.setOnClickListener((View view)-> translateMyMove(myCard1, myPlayedCard, 0));
+        myCard2.setOnClickListener((View view)-> translateMyMove(myCard2, myPlayedCard, 1));
+        myCard3.setOnClickListener((View view)-> translateMyMove(myCard3, myPlayedCard,2));
+        myCard4.setOnClickListener((View view)-> translateMyMove(myCard4, myPlayedCard,3));
+        myCard5.setOnClickListener((View view)-> translateMyMove(myCard5, myPlayedCard,4));
 
 
     }
 
-    private void translate(ImageView viewToMove, ImageView target, int index){
+    private void translateMyMove(ImageView viewToMove, ImageView target, int index){
         indexPlayedCard=index;
         int duration = 900;
         viewToMove.animate()
@@ -239,24 +347,122 @@ public class GameView extends AppCompatActivity {
                 target.setBackground(viewToMove.getBackground());
                 viewToMove.setVisibility(View.INVISIBLE);
                 makeTurn();
+                if(bothCardsArePlayed())collectCardPair();
             }
         }, duration);
 
     }
 
+    private void translateEnemiesMove(int index){
+        ImageView target = enemiesPlayedCard;
+        ImageView backCard = getEnemiesImageViewBack(index);
+        ImageView frontCard = getEnemiesImageViewFront(index);
+        int duration = 1500;
+        Log.info("check if images found");
+        if(backCard==null||frontCard ==null) return;
+        Log.info("check if images found");
+
+        backCard.animate()
+                .rotationY(180)
+                .x(target.getX())
+                .y(target.getY())
+                .setDuration(duration)
+                .start();
+
+        frontCard.animate()
+                .alpha(1)
+                .rotationY(180)
+                .x(target.getX())
+                .y(target.getY())
+                .setDuration(duration)
+                .start();
+
+        frontCard.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                target.setBackground(frontCard.getBackground());
+                frontCard.setAlpha(0);
+                backCard.setAlpha(0);
+                if(bothCardsArePlayed())collectCardPair();
+            }
+        }, duration+200);
+
+
+
+    }
+
+    public boolean bothCardsArePlayed(){
+        Log.info(String.valueOf(myPlayedCard.getBackground() != null && enemiesPlayedCard.getBackground() != null));
+        return myPlayedCard.getBackground() != null && enemiesPlayedCard.getBackground() != null;
+    }
+
+    public ImageView getEnemiesImageViewBack(int index){
+        ImageView viewToReturn=null;
+
+        switch (index){
+            case 0:
+                viewToReturn = enemyCardBack1;
+                break;
+            case 1:
+                viewToReturn = enemyCardBack2;
+                break;
+            case 2:
+                viewToReturn = enemyCardBack3;
+                break;
+            case 3:
+                viewToReturn = enemyCardBack4;
+                break;
+            case 4:
+                viewToReturn = enemyCardBack5;
+                break;
+        }
+
+        return viewToReturn;
+    }
+
+    public ImageView getEnemiesImageViewFront(int index){
+        ImageView viewToReturn=null;
+
+        switch (index){
+            case 0:
+                viewToReturn = enemyCardFront1;
+                break;
+            case 1:
+                viewToReturn = enemyCardFront2;
+                break;
+            case 2:
+                viewToReturn = enemyCardFront3;
+                break;
+            case 3:
+                viewToReturn = enemyCardFront4;
+                break;
+            case 4:
+                viewToReturn = enemyCardFront5;
+                break;
+        }
+
+        return viewToReturn;
+    }
+
     public void makeTurn(){
         haveToWaitForRespond=false;
-        if(game.getGameState()== GameState.AWAITING_TURN){
+        GameState state;
+        if(gameUp!=null)state=gameUp.getGameState();
+        else state = game.getGameState();
+        if(state == GameState.AWAITING_TURN){
             haveToWaitForRespond=true;
             game.makeTurn(me, new NormalTurn(me.getHandDeck().getDeck()[indexPlayedCard]));
         }
-        else if(game.getGameState() == GameState.AWAITING_RESPONSE) {
+        else if(state == GameState.AWAITING_RESPONSE) {
             game.respondOnTurn(me, me.getHandDeck().getDeck()[indexPlayedCard]);
         }
     }
 
     public void setUpCardsDependingOnWhoTurn(){
-        if(me.getId()!=game.getCurrentPlayer().getId()){
+        Player currentPlayer;
+        if(gameUp!=null)currentPlayer=gameUp.getCurrentPlayer();
+        else currentPlayer = game.getCurrentPlayer();
+        if(me.getId()!=currentPlayer.getId()){
             myCard1.setAlpha(0.5f);
             myCard1.setEnabled(false);
 
@@ -289,24 +495,98 @@ public class GameView extends AppCompatActivity {
         }
     }
 
-    public void playEnemiesCard(Card card){
+    public void playEnemiesCard(Card card, ArrayList<HandDeck> oldDecks){
+        Player enemy = game.getOtherPlayer(me);
+        HandDeck enemiesHandDeck = computeEnemiesDeck(oldDecks);
+        if(enemiesHandDeck.contains(card)){
+            translateEnemiesMove(enemiesHandDeck.getCardIndex(card));
+        }
+    }
 
+    public HandDeck computeEnemiesDeck(ArrayList<HandDeck> oldDecks){
+        HandDeck deckToReturn=null;
+        boolean isMyDeck;
+        for(HandDeck deck: oldDecks){
+            isMyDeck=false;
+            for(Card card: deck.getDeck()){
+                if(card!=null&&me.getHandDeck().contains(card))isMyDeck=true;
+            }
+            if(!isMyDeck)deckToReturn=deck;
+        }
+        return deckToReturn;
+    }
+
+    public void collectCardPair(){
+        if(game.getCurrentPlayer().getId()==me.getId()){
+            animateMyCardCollect();
+        } else animateEnemiesCardCollect();
+    }
+
+    public void animateMyCardCollect(){
+        int duration=2000;
+        myPlayedCard.animate()
+                .x(myCollectedDeck.getX())
+                .y(myCollectedDeck.getY())
+                .rotationBy(40)
+                .setDuration(duration)
+                .start();
+        enemiesPlayedCard.animate()
+                .x(myCollectedDeck.getX())
+                .y(myCollectedDeck.getY())
+                .rotationBy(40)
+                .setDuration(duration)
+                .start();
+
+
+    }
+
+    public void animateEnemiesCardCollect(){
+        int duration=2000;
+        myPlayedCard.animate()
+                .x(enemiesCollectedDeck.getX())
+                .y(enemiesCollectedDeck.getY())
+                .rotationBy(-40)
+                .setDuration(duration)
+                .start();
+        enemiesPlayedCard.animate()
+                .x(enemiesCollectedDeck.getX())
+                .y(enemiesCollectedDeck.getY())
+                .rotationBy(-40)
+                .setDuration(duration)
+                .start();
+        myPlayedCard.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                myPlayedCard.setImageDrawable(null);
+            }
+        }, duration+200);
+        enemiesPlayedCard.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                enemiesPlayedCard.setImageDrawable(null);
+                enemiesCollectedDeck.setBackground(enemiesPlayedCard.getBackground());
+
+            }
+        }, duration+200);
     }
 
 
     class UpdateListenerImpl extends UpdateListener{
 
         @Override
-        public void updated(GameUpdate gameUpdate) {
-            runOnUiThread(new Runnable() {
-
+        public void updated(GameUpdate gameUpdate, ArrayList<HandDeck> oldDecks) {
+            Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
+                    gameUp = gameUpdate;
                     initTextView();
                     setUpCardsDependingOnWhoTurn();
-
+                    Log.info("here");
+                    playEnemiesCard(gameUpdate.getPlayedCard(), oldDecks);
                 }
-            });
+            };
+            runOnUiThread(runnable);
+
         }
     }
 }
