@@ -30,7 +30,7 @@
             android:screenOrientation="landscape">
         </activity>
         <activity
-            android:name=".GameView"
+            android:name=".GameViewImpl"
             android:screenOrientation="landscape">
         </activity>
     </application>

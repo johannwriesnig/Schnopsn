@@ -192,7 +192,7 @@ public class Game {
             ArrayList<HandDeck> oldDecks= new ArrayList<>();
             oldDecks.add(getCopyOfDeck(currentPlayer));
             oldDecks.add(getCopyOfDeck(getOtherPlayer(currentPlayer)));
-            updateListener.updated(gameUpdate, oldDecks);
+            updateListener.updated(gameUpdate, oldDecks,gameState);
         }
         this.currentPlayer = gameUpdate.getCurrentPlayer();
         this.playedCard = gameUpdate.getPlayedCard();

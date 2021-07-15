@@ -6,5 +6,5 @@ import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
 import java.util.ArrayList;
 
 abstract public class UpdateListener {
-    abstract public void updated(GameUpdate gameUpdate, ArrayList<HandDeck> oldDecks);
+    abstract public void updated(GameUpdate gameUpdate, ArrayList<HandDeck> oldDecks, GameState previousState);
 }
