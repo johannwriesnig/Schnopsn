@@ -5,5 +5,7 @@ public enum GameState {
     NEW_ROUND_BEGINS,
     AWAITING_TURN,
     AWAITING_RESPONSE,
+    DRAWING,
+
     GAME_OVER
 }

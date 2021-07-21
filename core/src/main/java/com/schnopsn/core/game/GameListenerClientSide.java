@@ -22,7 +22,8 @@ public class GameListenerClientSide implements GameListener {
             client.sendMessage(new ChangeCard(gameUpdate.getPlayedCard()));
         else if(previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.AWAITING_TURN||
                 previousState==GameState.AWAITING_RESPONSE && gameUpdate.getGameState() ==GameState.NEW_ROUND_BEGINS||
-                previousState==GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.GAME_OVER)
+                previousState==GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.GAME_OVER||
+        previousState==GameState.AWAITING_RESPONSE&&gameUpdate.getGameState()==GameState.DRAWING)
             client.sendMessage(new Respond(gameUpdate.getPlayedCard()));
 
     }

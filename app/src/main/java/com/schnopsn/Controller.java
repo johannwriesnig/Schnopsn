@@ -1,10 +1,12 @@
 package com.schnopsn;
 
+import com.esotericsoftware.minlog.Log;
 import com.schnopsn.core.game.Game;
 import com.schnopsn.core.game.GameState;
 import com.schnopsn.core.game.Player;
 import com.schnopsn.core.game.UpdateListener;
 import com.schnopsn.core.game.cards.HandDeck;
+import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.server.client.GameClient;
 import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
 
@@ -22,51 +24,95 @@ public class Controller {
     private UpdateListenerImpl updateListener;
 
 
-    public Controller(GameView gameView){
+    public Controller(GameView gameView) {
         updateListener = new UpdateListenerImpl(this);
         this.gameView = gameView;
         game = GameClient.getInstance().getGame();
+        game.setUpdateListener(updateListener);
         initMyId();
         initPlayers();
+        blockCards();
     }
 
-    public void initMyId(){
-        for(Player player: game.getPlayers()){
-            if(player.getId()==GameClient.getInstance().getClient().getID()){
+    public void initMyId() {
+        for (Player player : game.getPlayers()) {
+            if (player.getId() == GameClient.getInstance().getClient().getID()) {
                 myId = player.getId();
             }
         }
     }
 
-    public void checkExecution(){
-        if(previousState==GameState.AWAITING_TURN&&gameUpdate.getGameState()==GameState.AWAITING_RESPONSE){
+    public void updateGUI() {
+        Log.info("Controller Info............");
+        Log.info("PreviousState: " + previousState + " / CurrentState: " + gameUpdate.getGameState());
+
+
+        if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE ||
+                previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.DRAWING) {
             computeTurn();
+        } else if(previousState==GameState.DRAWING && gameUpdate.getGameState()==GameState.AWAITING_TURN){
+            collectCards();
+            drawCards();
+
+        }
+
+        blockCards();
+    }
+
+    public void collectCards(){
+        if(isMyTurnBasedOnUpdate())gameView.collectCardsForMe();
+        else gameView.collectCardsForEnemy();
+    }
+
+    public void drawCards(){
+        if(gameUpdate.getCurrentPlayer().getId()==myId){
+            gameView.drawCardForMe();
+            gameView.drawCardForEnemy();
+        } else{
+            gameView.drawCardForEnemy();
+            gameView.drawCardForMe();
         }
     }
 
-    public void computeTurn(){
+    public void blockCards() {
+        if (isMyTurnBasedOnUpdate()) gameView.unblockMyCards();
+        else gameView.blockMyCards();
+    }
+
+    public void computeTurn() {
         int index;
-        if(isMyTurn()) {
+        if (isMyTurn()) {
             index = meAsPlayer.getHandDeck().getCardIndex(gameUpdate.getPlayedCard());
             gameView.playMyCard(index);
-        }
-        else {
+        } else {
             index = enemyAsPlayer.getHandDeck().getCardIndex(gameUpdate.getPlayedCard());
             gameView.playEnemiesCard(index);
         }
-
-
     }
 
-    public void initPlayers(){
-        for(Player player: game.getPlayers()){
-            if(player.getId()==myId)meAsPlayer=player;
-            else enemyAsPlayer=player;
+    public void initPlayers() {
+        for (Player player : game.getPlayers()) {
+            if (player.getId() == myId) meAsPlayer = player;
+            else enemyAsPlayer = player;
         }
     }
 
-    public boolean isMyTurn(){
-        return gameUpdate.getCurrentPlayer().getId() == myId;
+    public void playCard(int indexOfPlayedCard) {
+        if (game.getGameState() == GameState.AWAITING_TURN && isMyTurn()) {
+            game.makeTurn(meAsPlayer, new NormalTurn(meAsPlayer.getHandDeck().getDeck()[indexOfPlayedCard]));
+        } else if (game.getGameState() == GameState.AWAITING_RESPONSE && isMyTurn()) {
+            game.respondOnTurn(meAsPlayer, meAsPlayer.getHandDeck().getDeck()[indexOfPlayedCard]);
+        }
+    }
+
+    public boolean isMyTurn() {
+       return game.getCurrentPlayer().getId() == myId;
+
+    }
+
+    public boolean isMyTurnBasedOnUpdate(){
+        if(gameUpdate!=null)return gameUpdate.getCurrentPlayer().getId()==myId;
+        else return isMyTurn();
     }
 
 
@@ -82,7 +128,7 @@ public class Controller {
         this.oldDecks = oldDecks;
     }
 
-    public UpdateListenerImpl getUpdateListener(){
+    public UpdateListenerImpl getUpdateListener() {
         return updateListener;
     }
 }

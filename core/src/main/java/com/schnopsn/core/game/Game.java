@@ -43,9 +43,21 @@ public class Game {
             GameUpdate gameUpdate = new GameUpdate(players,currentPlayer,gameState,drawDeck,playedCard,trumpf, turn);
             gameListener.inform(gameUpdate, this.gameState);
         }
-        this.gameState = gameState;
+        if(!isClientGame()) this.gameState = gameState;
 
         if(gameState==GameState.NEW_ROUND_BEGINS && !(gameListener instanceof GameListenerClientSide))initRound();
+        if(gameState==GameState.DRAWING&&!isClientGame()) setUpDraws();
+
+    }
+
+    public boolean isClientGame(){
+        return gameListener instanceof GameListenerClientSide;
+    }
+
+    public void setUpDraws(){
+        if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
+        currentPlayer = getOtherPlayer(currentPlayer);
+        changeState(GameState.AWAITING_TURN);
     }
 
     public void makeTurn(Player player, Turn turn){
@@ -77,15 +89,14 @@ public class Game {
         CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
         if(playedCardIsHigherThanResponse){
             currentPlayer.getCollectedDeck().add(cardPair);
-            currentPlayer = getOtherPlayer(currentPlayer);
         }
         else {
             getOtherPlayer(currentPlayer).getCollectedDeck().add(cardPair);
         }
         boolean roundIsOver = isRoundOver();
         if(!roundIsOver){
-            if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
-            changeState(GameState.AWAITING_TURN);}
+            changeState(GameState.DRAWING);
+        }
 
     }
 
@@ -187,7 +198,6 @@ public class Game {
     }
 
     public void updateGame(GameUpdate gameUpdate){
-
         if(updateListener!=null){
             ArrayList<HandDeck> oldDecks= new ArrayList<>();
             oldDecks.add(getCopyOfDeck(currentPlayer));

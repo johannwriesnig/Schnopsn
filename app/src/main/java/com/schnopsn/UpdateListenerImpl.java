@@ -19,6 +19,6 @@ public class UpdateListenerImpl extends UpdateListener {
         controller.setGameUpdate(gameUpdate);
         controller.setOldDecks(oldDecks);
         controller.setPreviousState(previousState);
-        this.controller.checkExecution();
+        this.controller.updateGUI();
     }
 }

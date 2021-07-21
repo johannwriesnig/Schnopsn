@@ -1,5 +1,7 @@
 package com.schnopsn;
 
+import java.util.concurrent.Callable;
+
 public interface GameView {
 
     void playMyCard(int index);
@@ -10,5 +12,15 @@ public interface GameView {
 
     void drawCardForEnemy();
 
-    void blockCardsWhenNotMyTurn();
+    void blockMyCards();
+
+    void unblockMyCards();
+
+    void collectCardsForMe();
+
+    void collectCardsForEnemy();
+
+
+
+
 }

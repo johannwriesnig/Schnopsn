@@ -1,7 +1,9 @@
 package com.schnopsn;
 
+import android.animation.Animator;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -20,13 +22,12 @@ import com.schnopsn.core.game.cards.HandDeck;
 import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.server.client.GameClient;
 import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
+import com.schnopsn.core.server.dto.servertoclient.InitGame;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 public class GameViewImpl extends AppCompatActivity implements GameView {
-    private Button playCard;
-    private Button changeCard;
-    private Button respond;
     private Game game;
     private Player me;
 
@@ -59,6 +60,14 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     private TextView myStandingsView;
     private TextView enemyStandingsView;
 
+    private Controller controller;
+
+    private Handler handler;
+
+    private final int DURATION_PLAY_CARD = 900;
+    private final int DURATION_COLLECT_CARDS = 900;
+
+
 
 
     private int indexPlayedCard;
@@ -73,9 +82,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gameview);
 
-        playCard = findViewById(R.id.randomCard);
-        changeCard = findViewById(R.id.changeCard);
-        respond = findViewById(R.id.respond);
+        handler = new Handler();
 
         myCard1 = findViewById(R.id.cardImage1);
         myCard2 = findViewById(R.id.cardImage2);
@@ -114,20 +121,10 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
         setCardHeights();
         initRound();
-        setUpCardsDependingOnWhoTurn();
         initStandings();
         setListenerForMyCards();
+        controller = new Controller(this);
 
-
-
-
-        playCard.setOnClickListener(v->playCard());
-        changeCard.setOnClickListener(v->changeCard());
-        respond.setOnClickListener(v->respond());
-
-        Controller controller = new Controller(this);
-
-        game.setUpdateListener(controller.getUpdateListener());
         printInfo();
     }
 
@@ -197,20 +194,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         enemiesCollectedDeck.requestLayout();
     }
 
-    public void playCard(){
-        game.makeTurn(me, new NormalTurn(me.getHandDeck().getDeck()[0]));
-        printInfo();
-    }
-
-    public void respond(){
-        game.respondOnTurn(me,me.getHandDeck().getDeck()[0]);
-        printInfo();
-    }
-
-    public void changeCard(){
-        game.changeCard(me,me.getHandDeck().getDeck()[0]);
-        printInfo();
-    }
 
     public void initRound(){
         HandDeck myDeck = me.getHandDeck();
@@ -318,86 +301,16 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             Log.info("Farbe: "+ card.getCardColor()+" / Wert: "+ card.getCardValue());
         }
     }
-    public void initTextView(){
-        String info;
-        if(GameClient.getInstance().getGame().getCurrentPlayer().getId()==me.getId())info = "It's my turn";
-        else info = "It's the enemies turn";
-
-    }
 
     public void setListenerForMyCards(){
-        myCard1.setOnClickListener((View view)-> translateMyMove(myCard1, myPlayedCard, 0));
-        myCard2.setOnClickListener((View view)-> translateMyMove(myCard2, myPlayedCard, 1));
-        myCard3.setOnClickListener((View view)-> translateMyMove(myCard3, myPlayedCard,2));
-        myCard4.setOnClickListener((View view)-> translateMyMove(myCard4, myPlayedCard,3));
-        myCard5.setOnClickListener((View view)-> translateMyMove(myCard5, myPlayedCard,4));
-
-
-    }
-
-    private void translateMyMove(ImageView viewToMove, ImageView target, int index){
-        indexPlayedCard=index;
-        int duration = 900;
-        viewToMove.animate()
-                .x(target.getX())
-                .y(target.getY())
-                .setDuration(duration)
-                .start();
-        viewToMove.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                target.setBackground(viewToMove.getBackground());
-                viewToMove.setVisibility(View.INVISIBLE);
-                makeTurn();
-                if(bothCardsArePlayed())collectCardPair();
-
-            }
-        }, duration);
+        myCard1.setOnClickListener((View view)-> controller.playCard(0));
+        myCard2.setOnClickListener((View view)-> controller.playCard(1));
+        myCard3.setOnClickListener((View view)-> controller.playCard(2));
+        myCard4.setOnClickListener((View view)-> controller.playCard(3));
+        myCard5.setOnClickListener((View view)-> controller.playCard(4));
 
     }
 
-    private void translateEnemiesMove(int index){
-        ImageView target = enemiesPlayedCard;
-        ImageView backCard = getEnemiesImageViewBack(index);
-        ImageView frontCard = getEnemiesImageViewFront(index);
-        int duration = 1500;
-        Log.info("check if images found");
-        if(backCard==null||frontCard ==null) return;
-        Log.info("check if images found");
-
-        backCard.animate()
-                .rotationY(180)
-                .x(target.getX())
-                .y(target.getY())
-                .setDuration(duration)
-                .start();
-
-        frontCard.animate()
-                .alpha(1)
-                .rotationY(180)
-                .x(target.getX())
-                .y(target.getY())
-                .setDuration(duration)
-                .start();
-
-        frontCard.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                target.setBackground(frontCard.getBackground());
-                frontCard.setAlpha(0);
-                backCard.setAlpha(0);
-                if(bothCardsArePlayed())collectCardPair();
-            }
-        }, duration+200);
-
-
-
-    }
-
-    public boolean bothCardsArePlayed(){
-        Log.info(String.valueOf(myPlayedCard.getBackground() != null && enemiesPlayedCard.getBackground() != null));
-        return myPlayedCard.getBackground() != null && enemiesPlayedCard.getBackground() != null;
-    }
 
     public ImageView getEnemiesImageViewBack(int index){
         ImageView viewToReturn=null;
@@ -447,156 +360,143 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         return viewToReturn;
     }
 
-    public void makeTurn(){
-        haveToWaitForRespond=false;
-        GameState state;
-        if(gameUp!=null)state=gameUp.getGameState();
-        else state = game.getGameState();
-        if(state == GameState.AWAITING_TURN){
-            haveToWaitForRespond=true;
-            game.makeTurn(me, new NormalTurn(me.getHandDeck().getDeck()[indexPlayedCard]));
-        }
-        else if(state == GameState.AWAITING_RESPONSE) {
-            game.respondOnTurn(me, me.getHandDeck().getDeck()[indexPlayedCard]);
-        }
-    }
-
-    public void setUpCardsDependingOnWhoTurn(){
-        Player currentPlayer;
-        if(gameUp!=null)currentPlayer=gameUp.getCurrentPlayer();
-        else currentPlayer = game.getCurrentPlayer();
-        if(me.getId()!=currentPlayer.getId()){
-            myCard1.setAlpha(0.5f);
-            myCard1.setEnabled(false);
-
-            myCard2.setAlpha(0.5f);
-            myCard2.setEnabled(false);
-
-            myCard3.setAlpha(0.5f);
-            myCard3.setEnabled(false);
-
-            myCard4.setAlpha(0.5f);
-            myCard4.setEnabled(false);
-
-            myCard5.setAlpha(0.5f);
-            myCard5.setEnabled(false);
-        } else{
-            myCard1.setAlpha(1f);
-            myCard1.setEnabled(true);
-
-            myCard2.setAlpha(1f);
-            myCard2.setEnabled(true);
-
-            myCard3.setAlpha(1f);
-            myCard3.setEnabled(true);
-
-            myCard4.setAlpha(1f);
-            myCard4.setEnabled(true);
-
-            myCard5.setAlpha(1f);
-            myCard5.setEnabled(true);
-        }
-    }
-
-    public void playEnemiesCard(Card card, ArrayList<HandDeck> oldDecks){
-        HandDeck enemiesHandDeck = computeEnemiesDeck(oldDecks);
-        Log.info("check if contains");
-        for(Card c: enemiesHandDeck.getDeck()){
-            Log.info(c.getCardColor()+"/"+c.getCardValue());
-        }
-        if(enemiesHandDeck.contains(card)){
-            Log.info("it does contain");
-            translateEnemiesMove(enemiesHandDeck.getCardIndex(card));
-        }
-    }
-
-    public HandDeck computeEnemiesDeck(ArrayList<HandDeck> oldDecks){
-        HandDeck deckToReturn=null;
-        boolean isMyDeck;
-        for(HandDeck deck: oldDecks){
-            isMyDeck=false;
-            for(Card card: deck.getDeck()){
-                if(card!=null&&me.getHandDeck().contains(card))isMyDeck=true;
-            }
-            if(!isMyDeck)deckToReturn=deck;
-        }
-        return deckToReturn;
-    }
-
-    public void collectCardPair(){
-        if(game.getCurrentPlayer().getId()==me.getId()){
-            animateMyCardCollect();
-        } else animateEnemiesCardCollect();
-    }
-
-    public void animateMyCardCollect(){
-        int duration=2000;
-        enemiesPlayedCard.animate()
-                .x(myCollectedDeck.getX())
-                .y(myCollectedDeck.getY())
-                .rotationBy(40)
-                .setDuration(duration)
-                .start();
-        myPlayedCard.animate()
-                .x(myCollectedDeck.getX())
-                .y(myCollectedDeck.getY())
-                .rotationBy(40)
-                .setDuration(duration)
-                .start();
-
-        enemiesPlayedCard.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                myCollectedDeck.setBackground(enemiesPlayedCard.getBackground());
-                enemiesPlayedCard.setBackground(null);
-            }
-        }, duration);
-        myPlayedCard.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                myPlayedCard.setBackground(null);
-            }
-        }, duration);
-    }
-
-    public void animateEnemiesCardCollect(){
-        int duration=2000;
-        myPlayedCard.animate()
-                .x(enemiesCollectedDeck.getX())
-                .y(enemiesCollectedDeck.getY())
-                .rotationBy(-40)
-                .setDuration(duration)
-                .start();
-        enemiesPlayedCard.animate()
-                .x(enemiesCollectedDeck.getX())
-                .y(enemiesCollectedDeck.getY())
-                .rotationBy(-40)
-                .setDuration(duration)
-                .start();
-        myPlayedCard.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                myPlayedCard.setBackground(null);
-            }
-        }, duration);
-        enemiesPlayedCard.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                enemiesCollectedDeck.setBackground(enemiesPlayedCard.getBackground());
-                enemiesPlayedCard.setBackground(null);
-
-            }
-        }, duration);
-    }
 
     @Override
     public void playMyCard(int index) {
+        Log.info("playMycard gets called");
+        Runnable animation = new Runnable() {
+            @Override
+            public void run() {
+                Log.info("We are in runnable");
+                indexPlayedCard=index;
+                ImageView viewToMove = getMyCardAsImageView(index);
+                viewToMove.animate()
+                        .x(myPlayedCard.getX())
+                        .y(myPlayedCard.getY())
+                        .setDuration(DURATION_PLAY_CARD)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
 
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                myPlayedCard.setBackground(viewToMove.getBackground());
+                                viewToMove.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+
+            }
+        };
+        handler.post(animation);
+    }
+
+    public ImageView getMyCardAsImageView(int index){
+        ImageView viewToReturn;
+
+        switch(index){
+            case 0: viewToReturn=myCard1;
+                    break;
+            case 1: viewToReturn=myCard2;
+                    break;
+            case 2: viewToReturn=myCard3;
+                break;
+            case 3: viewToReturn=myCard4;
+                break;
+            case 4: viewToReturn=myCard5;
+                break;
+            default:viewToReturn=myCard1;
+        }
+         return viewToReturn;
     }
 
     @Override
     public void playEnemiesCard(int index) {
+        Log.info("playEnemiesCard gets called");
+        Runnable animation = new Runnable() {
+            @Override
+            public void run() {
+                Log.info("We are in runnable");
+                ImageView target = enemiesPlayedCard;
+                ImageView backCard = getEnemiesImageViewBack(index);
+                ImageView frontCard = getEnemiesImageViewFront(index);
+
+                if(backCard==null||frontCard==null)return;
+
+                backCard.animate()
+                        .rotationY(180)
+                        .x(target.getX())
+                        .y(target.getY())
+                        .setDuration(DURATION_PLAY_CARD)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                backCard.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+
+                frontCard.animate()
+                        .alpha(1)
+                        .rotationY(180)
+                        .x(target.getX())
+                        .y(target.getY())
+                        .setDuration(DURATION_PLAY_CARD)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                enemiesPlayedCard.setBackground(frontCard.getBackground());
+                                frontCard.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+
+            }
+        };
+
+        handler.post(animation);
 
     }
 
@@ -611,25 +511,194 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     }
 
     @Override
-    public void blockCardsWhenNotMyTurn() {
+    public void blockMyCards() {
+        Runnable animation = new Runnable() {
+            @Override
+            public void run() {
+                myCard1.setAlpha(0.5f);
+                myCard1.setEnabled(false);
+
+                myCard2.setAlpha(0.5f);
+                myCard2.setEnabled(false);
+
+                myCard3.setAlpha(0.5f);
+                myCard3.setEnabled(false);
+
+                myCard4.setAlpha(0.5f);
+                myCard4.setEnabled(false);
+
+                myCard5.setAlpha(0.5f);
+                myCard5.setEnabled(false);
+            }
+        };
+
+        handler.postDelayed(animation, DURATION_PLAY_CARD);
+    }
+
+    @Override
+    public void unblockMyCards(){
+        Runnable animation = new Runnable() {
+            @Override
+            public void run() {
+                myCard1.setAlpha(1f);
+                myCard1.setEnabled(true);
+
+                myCard2.setAlpha(1f);
+                myCard2.setEnabled(true);
+
+                myCard3.setAlpha(1f);
+                myCard3.setEnabled(true);
+
+                myCard4.setAlpha(1f);
+                myCard4.setEnabled(true);
+
+                myCard5.setAlpha(1f);
+                myCard5.setEnabled(true);
+            }
+        };
+        handler.postDelayed(animation, DURATION_PLAY_CARD);
+    }
+
+    @Override
+    public void collectCardsForEnemy() {
+        Runnable animation = new Runnable() {
+            @Override
+            public void run() {
+                myPlayedCard.animate()
+                        .x(enemiesCollectedDeck.getX())
+                        .y(enemiesCollectedDeck.getY())
+                        .rotationBy(-40)
+                        .setDuration(DURATION_COLLECT_CARDS)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                enemiesCollectedDeck.setBackground(myPlayedCard.getBackground());
+                                myPlayedCard.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+                enemiesPlayedCard.animate()
+                        .x(enemiesCollectedDeck.getX())
+                        .y(enemiesCollectedDeck.getY())
+                        .rotationBy(-40)
+                        .setDuration(DURATION_COLLECT_CARDS)
+                        .setListener(new Animator.AnimatorListener() {
+
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                enemiesPlayedCard.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+
+
+
+            }
+        };
+
+        handler.postDelayed(animation, DURATION_PLAY_CARD);
+
 
     }
 
+    @Override
+    public void collectCardsForMe() {
+        Runnable animation =new Runnable() {
+            @Override
+            public void run() {
+                int duration=2000;
+                enemiesPlayedCard.animate()
+                        .x(myCollectedDeck.getX())
+                        .y(myCollectedDeck.getY())
+                        .rotationBy(40)
+                        .setDuration(DURATION_COLLECT_CARDS)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
 
-    class UpdateListenerImpl extends UpdateListener{
+                            }
 
-        @Override
-        public void updated(GameUpdate gameUpdate, ArrayList<HandDeck> oldDecks, GameState previousState) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    gameUp = gameUpdate;
-                    setUpCardsDependingOnWhoTurn();
-                    playEnemiesCard(gameUpdate.getPlayedCard(), oldDecks);
-                }
-            };
-            runOnUiThread(runnable);
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                myCollectedDeck.setBackground(enemiesPlayedCard.getBackground());
+                                enemiesPlayedCard.setVisibility(View.INVISIBLE);
+                                animation.cancel();
+                            }
 
-        }
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                                Log.info("animation got cancelled");
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+                myPlayedCard.animate()
+                        .x(myCollectedDeck.getX())
+                        .y(myCollectedDeck.getY())
+                        .rotationBy(40)
+                        .setDuration(DURATION_COLLECT_CARDS)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                myPlayedCard.setVisibility(View.INVISIBLE);
+                                animation.cancel();
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        })
+                        .start();
+
+            }
+        };
+        handler.postDelayed(animation,DURATION_PLAY_CARD);
     }
+
+
 }
