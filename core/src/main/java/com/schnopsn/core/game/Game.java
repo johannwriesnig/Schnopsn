@@ -56,7 +56,6 @@ public class Game {
 
     public void setUpDraws(){
         if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
-        currentPlayer = getOtherPlayer(currentPlayer);
         changeState(GameState.AWAITING_TURN);
     }
 
@@ -88,6 +87,7 @@ public class Game {
         boolean playedCardIsHigherThanResponse = playedCardIsHigherThanResponse(responseCard);
         CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
         if(playedCardIsHigherThanResponse){
+            if(!isClientGame())currentPlayer = getOtherPlayer(currentPlayer);
             currentPlayer.getCollectedDeck().add(cardPair);
         }
         else {

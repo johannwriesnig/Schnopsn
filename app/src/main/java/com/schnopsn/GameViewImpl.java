@@ -67,6 +67,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     private final int DURATION_PLAY_CARD = 900;
     private final int DURATION_COLLECT_CARDS = 900;
 
+    private final float[] XY = new float[2];
+
 
 
 
@@ -123,6 +125,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         initRound();
         initStandings();
         setListenerForMyCards();
+        blockMyCards();
         controller = new Controller(this);
 
         printInfo();
@@ -370,6 +373,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                 Log.info("We are in runnable");
                 indexPlayedCard=index;
                 ImageView viewToMove = getMyCardAsImageView(index);
+                XY[0]=viewToMove.getX();
+                XY[1]=viewToMove.getY();
                 viewToMove.animate()
                         .x(myPlayedCard.getX())
                         .y(myPlayedCard.getY())
@@ -384,6 +389,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             public void onAnimationEnd(Animator animation) {
                                 myPlayedCard.setBackground(viewToMove.getBackground());
                                 viewToMove.setVisibility(View.INVISIBLE);
+                                viewToMove.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override
@@ -435,6 +441,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                 if(backCard==null||frontCard==null)return;
 
+                XY[0]=backCard.getX();
+                XY[1]=backCard.getY();
                 backCard.animate()
                         .rotationY(180)
                         .x(target.getX())
@@ -449,6 +457,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 backCard.setVisibility(View.INVISIBLE);
+                                backCard.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override
@@ -463,6 +472,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                         })
                         .start();
 
+                XY[0]=frontCard.getX();
+                XY[1]=frontCard.getY();
                 frontCard.animate()
                         .alpha(1)
                         .rotationY(180)
@@ -479,6 +490,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             public void onAnimationEnd(Animator animation) {
                                 enemiesPlayedCard.setBackground(frontCard.getBackground());
                                 frontCard.setVisibility(View.INVISIBLE);
+                                frontCard.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override
@@ -532,7 +544,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             }
         };
 
-        handler.postDelayed(animation, DURATION_PLAY_CARD);
+        handler.post(animation);
     }
 
     @Override
@@ -556,7 +568,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                 myCard5.setEnabled(true);
             }
         };
-        handler.postDelayed(animation, DURATION_PLAY_CARD);
+        handler.post(animation);
     }
 
     @Override
@@ -564,6 +576,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         Runnable animation = new Runnable() {
             @Override
             public void run() {
+                XY[0]=myPlayedCard.getX();
+                XY[1]=myPlayedCard.getY();
                 myPlayedCard.animate()
                         .x(enemiesCollectedDeck.getX())
                         .y(enemiesCollectedDeck.getY())
@@ -577,8 +591,9 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                             @Override
                             public void onAnimationEnd(Animator animation) {
-                                enemiesCollectedDeck.setBackground(myPlayedCard.getBackground());
+                                if(enemiesPlayedCard.getBackground()==null)enemiesPlayedCard.setBackgroundResource(R.drawable.cardback);
                                 myPlayedCard.setVisibility(View.INVISIBLE);
+                                myPlayedCard.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override
@@ -592,6 +607,9 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             }
                         })
                         .start();
+
+                XY[0]=enemiesPlayedCard.getX();
+                XY[1]=enemiesPlayedCard.getY();
                 enemiesPlayedCard.animate()
                         .x(enemiesCollectedDeck.getX())
                         .y(enemiesCollectedDeck.getY())
@@ -607,6 +625,9 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 enemiesPlayedCard.setVisibility(View.INVISIBLE);
+                                enemiesPlayedCard.animate().x(XY[0]).y(XY[1]).start();
+
+
                             }
 
                             @Override
@@ -636,7 +657,9 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         Runnable animation =new Runnable() {
             @Override
             public void run() {
-                int duration=2000;
+
+                XY[0]=enemiesPlayedCard.getX();
+                XY[1]=enemiesPlayedCard.getY();
                 enemiesPlayedCard.animate()
                         .x(myCollectedDeck.getX())
                         .y(myCollectedDeck.getY())
@@ -650,9 +673,10 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                             @Override
                             public void onAnimationEnd(Animator animation) {
-                                myCollectedDeck.setBackground(enemiesPlayedCard.getBackground());
+                                if(myCollectedDeck.getBackground()==null)myCollectedDeck.setBackgroundResource(R.drawable.cardback);
+
                                 enemiesPlayedCard.setVisibility(View.INVISIBLE);
-                                animation.cancel();
+                                enemiesPlayedCard.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override
@@ -666,6 +690,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             }
                         })
                         .start();
+                XY[0]=myPlayedCard.getX();
+                XY[1]=myPlayedCard.getY();
                 myPlayedCard.animate()
                         .x(myCollectedDeck.getX())
                         .y(myCollectedDeck.getY())
@@ -680,7 +706,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 myPlayedCard.setVisibility(View.INVISIBLE);
-                                animation.cancel();
+                                myPlayedCard.animate().x(XY[0]).y(XY[1]).start();
                             }
 
                             @Override

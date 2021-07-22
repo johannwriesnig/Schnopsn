@@ -47,8 +47,9 @@ public class Controller {
         Log.info("PreviousState: " + previousState + " / CurrentState: " + gameUpdate.getGameState());
 
 
-        if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE ||
-                previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.DRAWING) {
+        if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE) {
+            computeTurn();
+        } else if(previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.DRAWING){
             computeTurn();
         } else if(previousState==GameState.DRAWING && gameUpdate.getGameState()==GameState.AWAITING_TURN){
             collectCards();
@@ -80,6 +81,17 @@ public class Controller {
     }
 
     public void computeTurn() {
+        int index;
+        if (isMyTurn()) {
+            index = meAsPlayer.getHandDeck().getCardIndex(gameUpdate.getPlayedCard());
+            gameView.playMyCard(index);
+        } else {
+            index = enemyAsPlayer.getHandDeck().getCardIndex(gameUpdate.getPlayedCard());
+            gameView.playEnemiesCard(index);
+        }
+    }
+
+    public void computeResponse(){
         int index;
         if (isMyTurn()) {
             index = meAsPlayer.getHandDeck().getCardIndex(gameUpdate.getPlayedCard());
