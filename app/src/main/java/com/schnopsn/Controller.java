@@ -55,11 +55,11 @@ public class Controller {
             computeTurn();
         } else if(previousState==GameState.DRAWING && gameUpdate.getGameState()==GameState.AWAITING_TURN){
             collectCards();
-            //drawCards();
+            drawCards();
 
         }
-
         blockCards();
+
     }
 
     public void collectCards(){

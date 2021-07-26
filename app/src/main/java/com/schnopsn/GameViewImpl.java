@@ -1,15 +1,11 @@
 package com.schnopsn;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Display;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,18 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.esotericsoftware.minlog.Log;
 import com.schnopsn.core.game.Game;
-import com.schnopsn.core.game.GameState;
 import com.schnopsn.core.game.Player;
-import com.schnopsn.core.game.UpdateListener;
 import com.schnopsn.core.game.cards.Card;
 import com.schnopsn.core.game.cards.HandDeck;
-import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.server.client.GameClient;
-import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
-import com.schnopsn.core.server.dto.servertoclient.InitGame;
-
-import java.util.ArrayList;
-import java.util.concurrent.Callable;
 
 public class GameViewImpl extends AppCompatActivity implements GameView {
     private Game game;
@@ -68,15 +56,10 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     private Handler handler;
 
     private final int DURATION_PLAY_CARD = 900;
-    private final int DURATION_COLLECT_CARDS = 900;
+    private final int DURATION_COLLECT_CARDS = 1250;
 
 
     private int indexPlayedCard;
-    private boolean haveToWaitForRespond;
-
-    private GameUpdate gameUp;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +107,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         initRound();
         initStandings();
         setListenerForMyCards();
-        blockMyCards();
+        blockCardsWithoutHandler();
         controller = new Controller(this);
 
         printInfo();
@@ -519,6 +502,23 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
     }
 
+    public void blockCardsWithoutHandler(){
+        myCard1.setAlpha(0.5f);
+        myCard1.setEnabled(false);
+
+        myCard2.setAlpha(0.5f);
+        myCard2.setEnabled(false);
+
+        myCard3.setAlpha(0.5f);
+        myCard3.setEnabled(false);
+
+        myCard4.setAlpha(0.5f);
+        myCard4.setEnabled(false);
+
+        myCard5.setAlpha(0.5f);
+        myCard5.setEnabled(false);
+    }
+
     @Override
     public void blockMyCards() {
         Runnable animation = new Runnable() {
@@ -592,7 +592,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             myPlayedCard.animate()
                     .x(enemiesCollectedDeck.getX())
                     .y(enemiesCollectedDeck.getY())
-                    .rotationY(180)
                     .rotationBy(-40)
                     .setDuration(DURATION_COLLECT_CARDS)
                     .setListener(new Animator.AnimatorListener() {
@@ -604,7 +603,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                         @Override
                         public void onAnimationEnd(Animator animation1) {
                             if(enemiesCollectedDeck.getBackground()==null)enemiesCollectedDeck.setBackgroundResource(R.drawable.cardback);
-                            myPlayedCard.animate().alpha(0).x(myPlayedCardX).y(myPlayedCardY).rotationY(-180).rotationBy(40).setListener(null).setDuration(0).start();
+                            myPlayedCard.animate().alpha(0).x(myPlayedCardX).y(myPlayedCardY).rotationBy(40).setListener(null).setDuration(0).start();
                         }
 
                         @Override
@@ -624,7 +623,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             enemiesPlayedCard.animate()
                     .x(enemiesCollectedDeck.getX())
                     .y(enemiesCollectedDeck.getY())
-                    .rotationY(180)
                     .rotationBy(-40)
                     .setDuration(DURATION_COLLECT_CARDS)
                     .setListener(new Animator.AnimatorListener() {
@@ -636,7 +634,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                         @Override
                         public void onAnimationEnd(Animator animation1) {
-                            enemiesPlayedCard.animate().alpha(0).rotationBy(40).rotationY(-180).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
+                            enemiesPlayedCard.animate().alpha(0).rotationBy(40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
                                     .setListener(null)
                                     .setDuration(0)
                                     .start();
@@ -672,7 +670,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             enemiesPlayedCard.animate()
                     .x(myCollectedDeck.getX())
                     .y(myCollectedDeck.getY())
-                    .rotationY(180)
                     .rotationBy(40)
                     .setDuration(DURATION_COLLECT_CARDS)
                     .setListener(new Animator.AnimatorListener() {
@@ -684,7 +681,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                         @Override
                         public void onAnimationEnd(Animator animation1) {
                             if(myCollectedDeck.getBackground()==null)myCollectedDeck.setBackgroundResource(R.drawable.cardback);
-                            enemiesPlayedCard.animate().alpha(0).x(enemiesPlayedCardX).y(enemiesPlayedCardY).rotationY(-180)
+                            enemiesPlayedCard.animate().alpha(0).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
                                     .rotationBy(-40).setDuration(0).setListener(null).start();
                         }
 
@@ -703,7 +700,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             myPlayedCard.animate()
                     .x(myCollectedDeck.getX())
                     .y(myCollectedDeck.getY())
-                    .rotationY(180)
                     .rotationBy(40)
                     .setDuration(DURATION_COLLECT_CARDS)
                     .setListener(new Animator.AnimatorListener() {
@@ -714,7 +710,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                         @Override
                         public void onAnimationEnd(Animator animation1) {
-                            myPlayedCard.animate().alpha(0).x(myPlayedCardX).y(myPlayedCardY).rotationBy(-40).rotationY(-180).setDuration(0).setListener(null).start();
+                            myPlayedCard.animate().alpha(0).x(myPlayedCardX).y(myPlayedCardY).rotationBy(-40).setDuration(0).setListener(null).start();
                         }
 
                         @Override
