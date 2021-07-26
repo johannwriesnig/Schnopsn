@@ -45,6 +45,8 @@ public class Controller {
     public void updateGUI() {
         Log.info("Controller Info............");
         Log.info("PreviousState: " + previousState + " / CurrentState: " + gameUpdate.getGameState());
+        Log.info("IsMyTurn: "+ isMyTurn());
+        Log.info("IsMyTurnOnGameUpdate: "+ isMyTurnBasedOnUpdate());
 
 
         if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE) {
@@ -53,7 +55,7 @@ public class Controller {
             computeTurn();
         } else if(previousState==GameState.DRAWING && gameUpdate.getGameState()==GameState.AWAITING_TURN){
             collectCards();
-            drawCards();
+            //drawCards();
 
         }
 

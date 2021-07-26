@@ -65,27 +65,32 @@ public class Game {
         if(turn instanceof NormalTurn) {
             playedCard = turn.getPlayedCard();
             Log.info("Turn Card: " + playedCard.getCardColor()+ " / "+ playedCard.getCardValue());
-            currentPlayer.getHandDeck().remove(playedCard);
-            currentPlayer = getOtherPlayer(currentPlayer);
+            if(!isClientGame()){
+                currentPlayer.getHandDeck().remove(playedCard);
+                currentPlayer = getOtherPlayer(currentPlayer);
+            }
             changeState(GameState.AWAITING_RESPONSE);
         } else if(turn instanceof AnsagenTurn){
             if(!((AnsagenTurn) turn).isCallable())return;
             if(turn.getPlayedCard().getCardColor()==trumpf.getCardColor())currentPlayer.getCollectedDeck().addCallPoints(40);
             else currentPlayer.getCollectedDeck().addCallPoints(20);
             playedCard = turn.getPlayedCard();
-            currentPlayer.getHandDeck().remove(playedCard);
             boolean roundIsOver = isRoundOver();
-            currentPlayer = getOtherPlayer(currentPlayer);
+            if(!isClientGame()){
+                currentPlayer.getHandDeck().remove(playedCard);
+                currentPlayer = getOtherPlayer(currentPlayer);
+            }
             if(!roundIsOver)changeState(GameState.AWAITING_RESPONSE);
         }
+
     }
     public void respondOnTurn(Player player, Card responseCard){
         if(gameState!=GameState.AWAITING_RESPONSE || currentPlayer.getId()!=player.getId()||!player.getHandDeck().contains(responseCard))return;
         playedCard = responseCard;
         Log.info("Response Card: " + responseCard.getCardColor()+ " / "+ responseCard.getCardValue());
-        player.getHandDeck().remove(responseCard);
         boolean playedCardIsHigherThanResponse = playedCardIsHigherThanResponse(responseCard);
         CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
+        if(!isClientGame())player.getHandDeck().remove(responseCard);
         if(playedCardIsHigherThanResponse){
             if(!isClientGame())currentPlayer = getOtherPlayer(currentPlayer);
             currentPlayer.getCollectedDeck().add(cardPair);
