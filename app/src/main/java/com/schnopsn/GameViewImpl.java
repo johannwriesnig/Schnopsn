@@ -166,6 +166,14 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         myCollectedDeck.getLayoutParams().height = imageViewHeight;
         enemiesCollectedDeck.getLayoutParams().height = imageViewHeight;
 
+        deckCard1.getLayoutParams().height = imageViewHeight;
+
+        deckCard2Front.getLayoutParams().height = imageViewHeight;
+        deckCard2Back.getLayoutParams().height = imageViewHeight;
+
+        deckCard3Front.getLayoutParams().height = imageViewHeight;
+        deckCard3Back.getLayoutParams().height = imageViewHeight;
+
         requestLayouts();
 
     }
@@ -206,6 +214,12 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
         myCollectedDeck.requestLayout();
         enemiesCollectedDeck.requestLayout();
+
+        deckCard1.requestLayout();
+        deckCard2Front.requestLayout();
+        deckCard2Back.requestLayout();
+        deckCard3Back.requestLayout();
+        deckCard3Front.requestLayout();
     }
 
 
@@ -554,14 +568,14 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
     @Override
     public void drawCardForMeFirst() {
-        animateCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard3Front, deckCard3Back);
-        animateCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard), deckCard2Front, deckCard2Back);
+        animateMyCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard3Front, deckCard3Back);
+        animateEnemiesCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard),getEnemiesImageViewBack(indexEnemiesPlayedCard), deckCard2Front, deckCard2Back);
     }
 
     @Override
     public void drawCardForEnemyFirst() {
-        animateCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard), deckCard3Front, deckCard3Back);
-        animateCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard2Front, deckCard2Back);
+        animateEnemiesCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard),getEnemiesImageViewBack(indexEnemiesPlayedCard), deckCard3Front, deckCard3Back);
+        animateMyCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard2Front, deckCard2Back);
 
     }
 
@@ -574,7 +588,43 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
     }
 
-    public void animateCardDraw(ImageView target, ImageView deckCardFront, ImageView deckCardBack) {
+    public void animateEnemiesCardDraw(ImageView targetFront,ImageView targetBack, ImageView deckCardFront, ImageView deckCardBack){
+        Runnable animation = () -> {
+            float deckCardBackX = deckCardBack.getX();
+            float deckCardBackY = deckCardBack.getY();
+            deckCardBack.animate()
+                    .alpha(1)
+                    .x(targetFront.getX())
+                    .y(targetFront.getY())
+                    .setDuration(DURATION_COLLECT_CARDS)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation1) {
+                            targetFront.setBackground(deckCardFront.getBackground());
+                            targetBack.animate().alpha(1).start();
+                            deckCardFront.animate().alpha(0).start();
+                            deckCardBack.animate().alpha(0).x(deckCardBackX).y(deckCardBackY).setDuration(0).setListener(null).start();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation1) {
+
+                        }
+                    }).start(); };
+        handler.postDelayed(animation, DURATION_COLLECT_CARDS + DURATION_PLAY_CARD+100);
+    }
+
+    public void animateMyCardDraw(ImageView target, ImageView deckCardFront, ImageView deckCardBack) {
         Runnable animation = () -> {
             float deckCardFrontX = deckCardFront.getX();
             float deckCardFrontY = deckCardFront.getY();
@@ -611,7 +661,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             float deckCardBackX = deckCardBack.getX();
             float deckCardBackY = deckCardBack.getY();
             deckCardBack.animate()
-                    .alpha(0)
+                    .alpha(1)
                     .rotationYBy(180)
 
                     .x(target.getX())
@@ -639,7 +689,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                         }
                     }).start();
         };
-        handler.postDelayed(animation, DURATION_COLLECT_CARDS + 300);
+        handler.postDelayed(animation, DURATION_COLLECT_CARDS + DURATION_PLAY_CARD+100);
     }
 
     public void blockCardsInBeginning() {
