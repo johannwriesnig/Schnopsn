@@ -1,5 +1,7 @@
 package com.schnopsn;
 
+import com.schnopsn.core.game.cards.Card;
+
 import java.util.concurrent.Callable;
 
 public interface GameView {
@@ -8,9 +10,9 @@ public interface GameView {
 
     void playEnemiesCard(int index);
 
-    void drawCardForMe();
+    void drawCardForMeFirst();
 
-    void drawCardForEnemy();
+    void drawCardForEnemyFirst();
 
     void blockMyCards();
 
@@ -19,6 +21,8 @@ public interface GameView {
     void collectCardsForMe();
 
     void collectCardsForEnemy();
+
+    void initDrawCards(Card cardToDraw1, Card cardToDraw2);
 
 
 

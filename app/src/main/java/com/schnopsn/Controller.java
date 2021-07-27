@@ -4,7 +4,7 @@ import com.esotericsoftware.minlog.Log;
 import com.schnopsn.core.game.Game;
 import com.schnopsn.core.game.GameState;
 import com.schnopsn.core.game.Player;
-import com.schnopsn.core.game.UpdateListener;
+import com.schnopsn.core.game.cards.Card;
 import com.schnopsn.core.game.cards.HandDeck;
 import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.server.client.GameClient;
@@ -22,6 +22,8 @@ public class Controller {
     private Player meAsPlayer;
     private Player enemyAsPlayer;
     private UpdateListenerImpl updateListener;
+    private Card cardToDraw1;
+    private Card cardToDraw2;
 
 
     public Controller(GameView gameView) {
@@ -50,13 +52,15 @@ public class Controller {
 
 
         if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE) {
+            cardToDraw1 = game.getDrawDeck().getDrawDeck().get(0);
+            cardToDraw2 = game.getDrawDeck().getDrawDeck().get(1);
+            gameView.initDrawCards(cardToDraw1,cardToDraw2);
             computeTurn();
         } else if(previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.DRAWING){
             computeTurn();
         } else if(previousState==GameState.DRAWING && gameUpdate.getGameState()==GameState.AWAITING_TURN){
             collectCards();
             drawCards();
-
         }
         blockCards();
 
@@ -68,12 +72,12 @@ public class Controller {
     }
 
     public void drawCards(){
+        if(cardToDraw1==null||cardToDraw2==null)return;
         if(gameUpdate.getCurrentPlayer().getId()==myId){
-            gameView.drawCardForMe();
-            gameView.drawCardForEnemy();
+            gameView.drawCardForMeFirst();
         } else{
-            gameView.drawCardForEnemy();
-            gameView.drawCardForMe();
+            gameView.drawCardForEnemyFirst();
+
         }
     }
 

@@ -49,6 +49,14 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     private ImageView myCollectedDeck;
     private ImageView enemiesCollectedDeck;
 
+    private ImageView deckCard3Front;
+    private ImageView deckCard3Back;
+
+    private ImageView deckCard2Front;
+    private ImageView deckCard2Back;
+
+    private ImageView deckCard1;
+
     private ImageView trumpfCard;
 
     private TextView myStandingsView;
@@ -62,7 +70,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     private final int DURATION_COLLECT_CARDS = 1250;
 
 
-    private int indexPlayedCard;
+    private int indexMyPlayedCard;
+    private int indexEnemiesPlayedCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +107,14 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         myCollectedDeck = findViewById(R.id.myCollectedDeck);
         enemiesCollectedDeck = findViewById(R.id.enemiesCollectedDeck);
 
+        deckCard1 = findViewById(R.id.deckCard1);
+
+        deckCard2Front = findViewById(R.id.deckCard2Front);
+        deckCard2Back = findViewById(R.id.deckCard2Back);
+
+        deckCard3Front = findViewById(R.id.deckCard3Front);
+        deckCard3Back = findViewById(R.id.deckCard3Back);
+
         trumpfCard = findViewById(R.id.trumpf);
 
         myStandingsView = findViewById(R.id.myNameView);
@@ -105,8 +122,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
         game = GameClient.getInstance().getGame();
 
-        for(Player player: GameClient.getInstance().getGame().getPlayers()){
-            if(player.getId() == GameClient.getInstance().getClient().getID())me = player;
+        for (Player player : GameClient.getInstance().getGame().getPlayers()) {
+            if (player.getId() == GameClient.getInstance().getClient().getID()) me = player;
         }
 
         setCardHeights();
@@ -119,50 +136,50 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         printInfo();
     }
 
-    public void setCardHeights(){
+    public void setCardHeights() {
         int imageViewHeight = getHeight();
 
-        myCard1.getLayoutParams().height=imageViewHeight;
-        myCard2.getLayoutParams().height=imageViewHeight;
-        myCard3.getLayoutParams().height=imageViewHeight;
-        myCard4.getLayoutParams().height=imageViewHeight;
-        myCard5.getLayoutParams().height=imageViewHeight;
+        myCard1.getLayoutParams().height = imageViewHeight;
+        myCard2.getLayoutParams().height = imageViewHeight;
+        myCard3.getLayoutParams().height = imageViewHeight;
+        myCard4.getLayoutParams().height = imageViewHeight;
+        myCard5.getLayoutParams().height = imageViewHeight;
 
-        enemyCardFront1.getLayoutParams().height=imageViewHeight;
-        enemyCardFront2.getLayoutParams().height=imageViewHeight;
-        enemyCardFront3.getLayoutParams().height=imageViewHeight;
-        enemyCardFront4.getLayoutParams().height=imageViewHeight;
-        enemyCardFront5.getLayoutParams().height=imageViewHeight;
+        enemyCardFront1.getLayoutParams().height = imageViewHeight;
+        enemyCardFront2.getLayoutParams().height = imageViewHeight;
+        enemyCardFront3.getLayoutParams().height = imageViewHeight;
+        enemyCardFront4.getLayoutParams().height = imageViewHeight;
+        enemyCardFront5.getLayoutParams().height = imageViewHeight;
 
-        enemyCardBack1.getLayoutParams().height=imageViewHeight;
-        enemyCardBack2.getLayoutParams().height=imageViewHeight;
-        enemyCardBack3.getLayoutParams().height=imageViewHeight;
-        enemyCardBack4.getLayoutParams().height=imageViewHeight;
-        enemyCardBack5.getLayoutParams().height=imageViewHeight;
+        enemyCardBack1.getLayoutParams().height = imageViewHeight;
+        enemyCardBack2.getLayoutParams().height = imageViewHeight;
+        enemyCardBack3.getLayoutParams().height = imageViewHeight;
+        enemyCardBack4.getLayoutParams().height = imageViewHeight;
+        enemyCardBack5.getLayoutParams().height = imageViewHeight;
 
-        myPlayedCardFront.getLayoutParams().height=imageViewHeight;
-        myPlayedCardBack.getLayoutParams().height=imageViewHeight;
+        myPlayedCardFront.getLayoutParams().height = imageViewHeight;
+        myPlayedCardBack.getLayoutParams().height = imageViewHeight;
 
-        enemiesPlayedCardFront.getLayoutParams().height=imageViewHeight;
-        enemiesPlayedCardBack.getLayoutParams().height=imageViewHeight;
+        enemiesPlayedCardFront.getLayoutParams().height = imageViewHeight;
+        enemiesPlayedCardBack.getLayoutParams().height = imageViewHeight;
 
-        myCollectedDeck.getLayoutParams().height=imageViewHeight;
-        enemiesCollectedDeck.getLayoutParams().height=imageViewHeight;
+        myCollectedDeck.getLayoutParams().height = imageViewHeight;
+        enemiesCollectedDeck.getLayoutParams().height = imageViewHeight;
 
         requestLayouts();
 
     }
 
-    public int getHeight(){
+    public int getHeight() {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int windowWidth = size.x;
         int windowHeight = size.y;
-        return windowHeight/3-75;
+        return windowHeight / 3 - 75;
     }
 
-    public void requestLayouts(){
+    public void requestLayouts() {
         myCard1.requestLayout();
         myCard2.requestLayout();
         myCard3.requestLayout();
@@ -192,7 +209,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     }
 
 
-    public void initRound(){
+    public void initRound() {
         HandDeck myDeck = me.getHandDeck();
 
         setCardImage(myCard1, myDeck.getDeck()[0]);
@@ -220,99 +237,123 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     }
 
 
-    public void setCardImage(ImageView view, Card card){
-        switch(card.getCardColor()){
-            case PIK: switch (card.getCardValue()){
-                case ASS:view.setBackgroundResource(R.drawable.pikass);
+    public void setCardImage(ImageView view, Card card) {
+        switch (card.getCardColor()) {
+            case PIK:
+                switch (card.getCardValue()) {
+                    case ASS:
+                        view.setBackgroundResource(R.drawable.pikass);
+                        break;
+                    case ZEHNER:
+                        view.setBackgroundResource(R.drawable.pikzehn);
+                        break;
+                    case KOENIG:
+                        view.setBackgroundResource(R.drawable.pikkoenig);
+                        break;
+                    case DAME:
+                        view.setBackgroundResource(R.drawable.pikdame);
+                        break;
+                    case BUBE:
+                        view.setBackgroundResource(R.drawable.pikbub);
+                        break;
+                }
                 break;
-                case ZEHNER:view.setBackgroundResource(R.drawable.pikzehn);
-                    break;
-                case KOENIG:view.setBackgroundResource(R.drawable.pikkoenig);
-                    break;
-                case DAME:view.setBackgroundResource(R.drawable.pikdame);
-                    break;
-                case BUBE:view.setBackgroundResource(R.drawable.pikbub);
-                    break;
-            }
-            break;
-            case KARO: switch (card.getCardValue()){
-                case ASS:view.setBackgroundResource(R.drawable.karoass);
-                    break;
-                case ZEHNER:view.setBackgroundResource(R.drawable.karozehn);
-                    break;
-                case KOENIG:view.setBackgroundResource(R.drawable.karokoenig);
-                    break;
-                case DAME:view.setBackgroundResource(R.drawable.karodame);
-                    break;
-                case BUBE:view.setBackgroundResource(R.drawable.karobub);
-                    break;
-            }
-            break;
-            case KREUZ: switch (card.getCardValue()){
-                case ASS:view.setBackgroundResource(R.drawable.kreuzass);
-                    break;
-                case ZEHNER:view.setBackgroundResource(R.drawable.kreuzzehn);
-                    break;
-                case KOENIG:view.setBackgroundResource(R.drawable.kreuzkoenig);
-                    break;
-                case DAME:view.setBackgroundResource(R.drawable.kreuzdame);
-                    break;
-                case BUBE:view.setBackgroundResource(R.drawable.kreuzbub);
-                    break;
-            }
-            break;
-            case HERZ: switch (card.getCardValue()){
-                case ASS:view.setBackgroundResource(R.drawable.herzass);
-                    break;
-                case ZEHNER:view.setBackgroundResource(R.drawable.herzzehn);
-                    break;
-                case KOENIG:view.setBackgroundResource(R.drawable.herzkoenig);
-                    break;
-                case DAME:view.setBackgroundResource(R.drawable.herzdame);
-                    break;
-                case BUBE:view.setBackgroundResource(R.drawable.herzbub);
-                    break;
-            }
-            break;
+            case KARO:
+                switch (card.getCardValue()) {
+                    case ASS:
+                        view.setBackgroundResource(R.drawable.karoass);
+                        break;
+                    case ZEHNER:
+                        view.setBackgroundResource(R.drawable.karozehn);
+                        break;
+                    case KOENIG:
+                        view.setBackgroundResource(R.drawable.karokoenig);
+                        break;
+                    case DAME:
+                        view.setBackgroundResource(R.drawable.karodame);
+                        break;
+                    case BUBE:
+                        view.setBackgroundResource(R.drawable.karobub);
+                        break;
+                }
+                break;
+            case KREUZ:
+                switch (card.getCardValue()) {
+                    case ASS:
+                        view.setBackgroundResource(R.drawable.kreuzass);
+                        break;
+                    case ZEHNER:
+                        view.setBackgroundResource(R.drawable.kreuzzehn);
+                        break;
+                    case KOENIG:
+                        view.setBackgroundResource(R.drawable.kreuzkoenig);
+                        break;
+                    case DAME:
+                        view.setBackgroundResource(R.drawable.kreuzdame);
+                        break;
+                    case BUBE:
+                        view.setBackgroundResource(R.drawable.kreuzbub);
+                        break;
+                }
+                break;
+            case HERZ:
+                switch (card.getCardValue()) {
+                    case ASS:
+                        view.setBackgroundResource(R.drawable.herzass);
+                        break;
+                    case ZEHNER:
+                        view.setBackgroundResource(R.drawable.herzzehn);
+                        break;
+                    case KOENIG:
+                        view.setBackgroundResource(R.drawable.herzkoenig);
+                        break;
+                    case DAME:
+                        view.setBackgroundResource(R.drawable.herzdame);
+                        break;
+                    case BUBE:
+                        view.setBackgroundResource(R.drawable.herzbub);
+                        break;
+                }
+                break;
         }
     }
 
-    public void initStandings(){
+    public void initStandings() {
         String myStandings;
-        myStandings = me.getName()+": "+ me.getBummerl();
+        myStandings = me.getName() + ": " + me.getBummerl();
         myStandingsView.setText(myStandings);
 
         String enemyStandings;
         Player enemy = game.getOtherPlayer(me);
-        enemyStandings = enemy.getName()+": " + enemy.getBummerl();
+        enemyStandings = enemy.getName() + ": " + enemy.getBummerl();
         enemyStandingsView.setText(enemyStandings);
     }
 
-    public void printInfo(){
-        Log.info("Trumpf: " + game.getTrumpf().getCardColor()+ " / "+ game.getTrumpf().getCardValue());
+    public void printInfo() {
+        Log.info("Trumpf: " + game.getTrumpf().getCardColor() + " / " + game.getTrumpf().getCardValue());
         Log.info("This is me: " + GameClient.getInstance().getClient().getID());
         Log.info("CurrentPlayer is: " + game.getCurrentPlayer().getId());
         Log.info("MyDeck: ");
-        for(Card card: me.getHandDeck().getDeck()){
-            if(card!=null)
-            Log.info("Farbe: "+ card.getCardColor()+" / Wert: "+ card.getCardValue());
+        for (Card card : me.getHandDeck().getDeck()) {
+            if (card != null)
+                Log.info("Farbe: " + card.getCardColor() + " / Wert: " + card.getCardValue());
         }
     }
 
-    public void setListenerForMyCards(){
-        myCard1.setOnClickListener((View view)-> controller.playCard(0));
-        myCard2.setOnClickListener((View view)-> controller.playCard(1));
-        myCard3.setOnClickListener((View view)-> controller.playCard(2));
-        myCard4.setOnClickListener((View view)-> controller.playCard(3));
-        myCard5.setOnClickListener((View view)-> controller.playCard(4));
+    public void setListenerForMyCards() {
+        myCard1.setOnClickListener((View view) -> controller.playCard(0));
+        myCard2.setOnClickListener((View view) -> controller.playCard(1));
+        myCard3.setOnClickListener((View view) -> controller.playCard(2));
+        myCard4.setOnClickListener((View view) -> controller.playCard(3));
+        myCard5.setOnClickListener((View view) -> controller.playCard(4));
 
     }
 
 
-    public ImageView getEnemiesImageViewBack(int index){
-        ImageView viewToReturn=null;
+    public ImageView getEnemiesImageViewBack(int index) {
+        ImageView viewToReturn = null;
 
-        switch (index){
+        switch (index) {
             case 0:
                 viewToReturn = enemyCardBack1;
                 break;
@@ -333,10 +374,10 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         return viewToReturn;
     }
 
-    public ImageView getEnemiesImageViewFront(int index){
-        ImageView viewToReturn=null;
+    public ImageView getEnemiesImageViewFront(int index) {
+        ImageView viewToReturn = null;
 
-        switch (index){
+        switch (index) {
             case 0:
                 viewToReturn = enemyCardFront1;
                 break;
@@ -365,7 +406,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             @Override
             public void run() {
                 Log.info("We are in runnable: playMyCard");
-                indexPlayedCard=index;
+                indexMyPlayedCard = index;
                 ImageView viewToMove = getMyCardAsImageView(index);
                 float viewToMoveX = viewToMove.getX();
                 float viewToMoveY = viewToMove.getY();
@@ -402,23 +443,29 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         handler.post(animation);
     }
 
-    public ImageView getMyCardAsImageView(int index){
+    public ImageView getMyCardAsImageView(int index) {
         ImageView viewToReturn;
 
-        switch(index){
-            case 0: viewToReturn=myCard1;
-                    break;
-            case 1: viewToReturn=myCard2;
-                    break;
-            case 2: viewToReturn=myCard3;
+        switch (index) {
+            case 0:
+                viewToReturn = myCard1;
                 break;
-            case 3: viewToReturn=myCard4;
+            case 1:
+                viewToReturn = myCard2;
                 break;
-            case 4: viewToReturn=myCard5;
+            case 2:
+                viewToReturn = myCard3;
                 break;
-            default:viewToReturn=myCard1;
+            case 3:
+                viewToReturn = myCard4;
+                break;
+            case 4:
+                viewToReturn = myCard5;
+                break;
+            default:
+                viewToReturn = myCard1;
         }
-         return viewToReturn;
+        return viewToReturn;
     }
 
     @Override
@@ -428,11 +475,12 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             @Override
             public void run() {
                 Log.info("We are in runnable");
+                indexEnemiesPlayedCard = index;
                 ImageView target = enemiesPlayedCardFront;
                 ImageView backCard = getEnemiesImageViewBack(index);
                 ImageView frontCard = getEnemiesImageViewFront(index);
 
-                if(backCard==null||frontCard==null)return;
+                if (backCard == null || frontCard == null) return;
 
 
                 float backCardX = backCard.getX();
@@ -483,7 +531,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                             public void onAnimationEnd(Animator animation) {
                                 enemiesPlayedCardFront.setBackground(frontCard.getBackground());
                                 enemiesPlayedCardFront.animate().alpha(1).setDuration(0).setListener(null).start();
-                                frontCard.animate().alpha(0).x(frontCardX ).y(frontCardY).setDuration(0).setListener(null).start();
+                                frontCard.animate().alpha(0).x(frontCardX).y(frontCardY).setDuration(0).setListener(null).start();
                             }
 
                             @Override
@@ -505,16 +553,96 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     }
 
     @Override
-    public void drawCardForMe() {
+    public void drawCardForMeFirst() {
+        animateCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard3Front, deckCard3Back);
+        animateCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard), deckCard2Front, deckCard2Back);
+    }
+
+    @Override
+    public void drawCardForEnemyFirst() {
+        animateCardDraw(getEnemiesImageViewFront(indexEnemiesPlayedCard), deckCard3Front, deckCard3Back);
+        animateCardDraw(getMyCardAsImageView(indexMyPlayedCard), deckCard2Front, deckCard2Back);
 
     }
 
     @Override
-    public void drawCardForEnemy() {
+    public void initDrawCards(Card cardToDraw1, Card cardToDraw2) {
+        runOnUiThread(() -> {
+            setCardImage(deckCard3Front, cardToDraw1);
+            setCardImage(deckCard2Front, cardToDraw2);
+        });
 
     }
 
-    public void blockCardsInBeginning(){
+    public void animateCardDraw(ImageView target, ImageView deckCardFront, ImageView deckCardBack) {
+        Runnable animation = () -> {
+            float deckCardFrontX = deckCardFront.getX();
+            float deckCardFrontY = deckCardFront.getY();
+            deckCardFront.animate()
+                    .alpha(1)
+                    .rotationYBy(180)
+                    .x(target.getX())
+                    .y(target.getY())
+                    .setDuration(DURATION_COLLECT_CARDS)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation1) {
+                            target.setBackground(deckCardFront.getBackground());
+                            target.animate().alpha(1).start();
+                            deckCardFront.animate().rotationYBy(180).alpha(0).x(deckCardFrontX).y(deckCardFrontY).setDuration(0).setListener(null).start();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation1) {
+
+                        }
+                    }).start();
+
+            float deckCardBackX = deckCardBack.getX();
+            float deckCardBackY = deckCardBack.getY();
+            deckCardBack.animate()
+                    .alpha(0)
+                    .rotationYBy(180)
+
+                    .x(target.getX())
+                    .y(target.getY())
+                    .setDuration(DURATION_COLLECT_CARDS)
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation1) {
+                            deckCardBack.animate().alpha(0).rotationYBy(180).x(deckCardBackX).y(deckCardBackY).setDuration(0).setListener(null).start();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation1) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation1) {
+
+                        }
+                    }).start();
+        };
+        handler.postDelayed(animation, DURATION_COLLECT_CARDS + 300);
+    }
+
+    public void blockCardsInBeginning() {
         myCard1.setAlpha(0.5f);
         myCard1.setEnabled(false);
 
@@ -541,26 +669,30 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             @Override
             public void run() {
 
-                if(cardIsVisible(myCard1)){
-                myCard1.setAlpha(0.5f);
-                myCard1.setEnabled(false);
+                if (cardIsVisible(myCard1)) {
+                    myCard1.setAlpha(0.5f);
+                    myCard1.setEnabled(false);
                 }
 
-                if(cardIsVisible(myCard2)){
-                myCard2.setAlpha(0.5f);
-                myCard2.setEnabled(false);}
+                if (cardIsVisible(myCard2)) {
+                    myCard2.setAlpha(0.5f);
+                    myCard2.setEnabled(false);
+                }
 
-                if(cardIsVisible(myCard3)){
-                myCard3.setAlpha(0.5f);
-                myCard3.setEnabled(false);}
+                if (cardIsVisible(myCard3)) {
+                    myCard3.setAlpha(0.5f);
+                    myCard3.setEnabled(false);
+                }
 
-                if(cardIsVisible(myCard4)){
-                myCard4.setAlpha(0.5f);
-                myCard4.setEnabled(false);}
+                if (cardIsVisible(myCard4)) {
+                    myCard4.setAlpha(0.5f);
+                    myCard4.setEnabled(false);
+                }
 
-                if(cardIsVisible(myCard5)){
-                myCard5.setAlpha(0.5f);
-                myCard5.setEnabled(false);}
+                if (cardIsVisible(myCard5)) {
+                    myCard5.setAlpha(0.5f);
+                    myCard5.setEnabled(false);
+                }
             }
         };
 
@@ -568,37 +700,43 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
     }
 
     @Override
-    public void unblockMyCards(){
+    public void unblockMyCards() {
         Runnable animation = new Runnable() {
             @Override
             public void run() {
-                if(cardIsVisible(myCard1)){
-                myCard1.setAlpha(1f);
-                myCard1.setEnabled(true);}
+                if (cardIsVisible(myCard1)) {
+                    myCard1.setAlpha(1f);
+                    myCard1.setEnabled(true);
+                }
 
-                if(cardIsVisible(myCard2)){
-                myCard2.setAlpha(1f);
-                myCard2.setEnabled(true);}
+                if (cardIsVisible(myCard2)) {
+                    myCard2.setAlpha(1f);
+                    myCard2.setEnabled(true);
+                }
 
-                if(cardIsVisible(myCard3)){
-                myCard3.setAlpha(1f);
-                myCard3.setEnabled(true);}
+                if (cardIsVisible(myCard3)) {
+                    myCard3.setAlpha(1f);
+                    myCard3.setEnabled(true);
+                }
 
-                if(cardIsVisible(myCard4)){
-                myCard4.setAlpha(1f);
-                myCard4.setEnabled(true);}
+                if (cardIsVisible(myCard4)) {
+                    myCard4.setAlpha(1f);
+                    myCard4.setEnabled(true);
+                }
 
-                if(cardIsVisible(myCard5)){
-                myCard5.setAlpha(1f);
-                myCard5.setEnabled(true);}
+                if (cardIsVisible(myCard5)) {
+                    myCard5.setAlpha(1f);
+                    myCard5.setEnabled(true);
+                }
             }
         };
         handler.postDelayed(animation, DURATION_PLAY_CARD);
     }
 
-    public boolean cardIsVisible(ImageView imageView){
+    public boolean cardIsVisible(ImageView imageView) {
         return imageView.getAlpha() != 0;
     }
+
     @Override
     public void collectCardsForEnemy() {
         Runnable animation = () -> {
@@ -608,12 +746,12 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
         };
 
-        handler.postDelayed(animation,DURATION_PLAY_CARD+100);
+        handler.postDelayed(animation, DURATION_PLAY_CARD + 100);
 
 
     }
 
-    public void animateEnemyCardsToEnemiesStaple(){
+    public void animateEnemyCardsToEnemiesStaple() {
         float enemiesPlayedCardX = enemiesPlayedCardFront.getX();
         float enemiesPlayedCardY = enemiesPlayedCardFront.getY();
         enemiesPlayedCardFront.animate()
@@ -678,7 +816,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                 }).start();
     }
 
-    public void animateMyCardsToEnemiesStaple(){
+    public void animateMyCardsToEnemiesStaple() {
         float myPlayedCardX = myPlayedCardFront.getX();
         float myPlayedCardY = myPlayedCardFront.getY();
         myPlayedCardFront.animate()
@@ -695,7 +833,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                     @Override
                     public void onAnimationEnd(Animator animation1) {
-                        if(enemiesCollectedDeck.getBackground()==null)enemiesCollectedDeck.setBackgroundResource(R.drawable.cardback);
+                        if (enemiesCollectedDeck.getBackground() == null)
+                            enemiesCollectedDeck.setBackgroundResource(R.drawable.cardback);
                         myPlayedCardFront.animate().rotationYBy(180).rotationBy(-40).alpha(0).x(myPlayedCardX).y(myPlayedCardY).setDuration(0).setListener(null).start();
                     }
 
@@ -710,8 +849,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                     }
                 }).start();
 
-        float myPlayedCardBackX=myPlayedCardBack.getX();
-        float myPlayedCardBackY=myPlayedCardBack.getY();
+        float myPlayedCardBackX = myPlayedCardBack.getX();
+        float myPlayedCardBackY = myPlayedCardBack.getY();
         myPlayedCardBack.animate()
                 .alpha(1)
                 .rotationYBy(180)
@@ -752,10 +891,10 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
             animateMyCardsToMyStaple();
 
         };
-        handler.postDelayed(animation,DURATION_PLAY_CARD+100);
+        handler.postDelayed(animation, DURATION_PLAY_CARD + 100);
     }
 
-    public void animateMyCardsToMyStaple(){
+    public void animateMyCardsToMyStaple() {
         float myPlayedCardX = myPlayedCardFront.getX();
         float myPlayedCardY = myPlayedCardFront.getY();
         myPlayedCardFront.animate()
@@ -773,6 +912,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                     @Override
                     public void onAnimationEnd(Animator animation1) {
+
                         myPlayedCardFront.animate().rotationYBy(180).rotationBy(40).alpha(0).x(myPlayedCardX).y(myPlayedCardY).setDuration(0).setListener(null).start();
                     }
 
@@ -787,8 +927,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
                     }
                 }).start();
 
-        float myPlayedCardBackX=myPlayedCardBack.getX();
-        float myPlayedCardBackY=myPlayedCardBack.getY();
+        float myPlayedCardBackX = myPlayedCardBack.getX();
+        float myPlayedCardBackY = myPlayedCardBack.getY();
         myPlayedCardBack.animate()
                 .alpha(1)
                 .rotationYBy(180)
@@ -805,6 +945,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                     @Override
                     public void onAnimationEnd(Animator animation1) {
+
                         myPlayedCardBack.animate().alpha(0).rotationYBy(180).rotationBy(40).x(myPlayedCardBackX).y(myPlayedCardBackY).setDuration(0).setListener(null).start();
                     }
 
@@ -822,7 +963,7 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
     }
 
-    public void animateEnemyCardsToMyStaple(){
+    public void animateEnemyCardsToMyStaple() {
         float enemiesPlayedCardX = enemiesPlayedCardFront.getX();
         float enemiesPlayedCardY = enemiesPlayedCardFront.getY();
         enemiesPlayedCardFront.animate()
@@ -839,7 +980,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                     @Override
                     public void onAnimationEnd(Animator animation1) {
-                        if(myCollectedDeck.getBackground()==null)myCollectedDeck.setBackgroundResource(R.drawable.cardback);
                         enemiesPlayedCardFront.animate().alpha(0).rotationYBy(180).rotationBy(40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
                                 .setDuration(0).setListener(null).start();
                     }
@@ -872,6 +1012,8 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
                     @Override
                     public void onAnimationEnd(Animator animation1) {
+                        if (myCollectedDeck.getBackground() == null)
+                            myCollectedDeck.setBackgroundResource(R.drawable.cardback);
                         enemiesPlayedCardBack.animate().alpha(0).rotationYBy(180).rotationBy(40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
                                 .setDuration(0).setListener(null).start();
                     }
