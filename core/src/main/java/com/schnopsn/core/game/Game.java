@@ -6,12 +6,14 @@ import com.schnopsn.core.game.cards.CardValue;
 import com.schnopsn.core.game.cards.CollectedDeck;
 import com.schnopsn.core.game.cards.DeckBuilder;
 import com.schnopsn.core.game.cards.DrawDeck;
+import com.schnopsn.core.game.cards.HandDeck;
 import com.schnopsn.core.game.turns.AnsagenTurn;
 import com.schnopsn.core.game.turns.NormalTurn;
 import com.schnopsn.core.game.turns.Turn;
 import com.schnopsn.core.server.dto.servertoclient.GameUpdate;
 import com.esotericsoftware.minlog.Log;
 
+import java.util.ArrayList;
 
 
 public class Game {
@@ -41,9 +43,20 @@ public class Game {
             GameUpdate gameUpdate = new GameUpdate(players,currentPlayer,gameState,drawDeck,playedCard,trumpf, turn);
             gameListener.inform(gameUpdate, this.gameState);
         }
-        this.gameState = gameState;
+        if(!isClientGame()) this.gameState = gameState;
 
         if(gameState==GameState.NEW_ROUND_BEGINS && !(gameListener instanceof GameListenerClientSide))initRound();
+        if(gameState==GameState.DRAWING&&!isClientGame()) setUpDraws();
+
+    }
+
+    public boolean isClientGame(){
+        return gameListener instanceof GameListenerClientSide;
+    }
+
+    public void setUpDraws(){
+        if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
+        changeState(GameState.AWAITING_TURN);
     }
 
     public void makeTurn(Player player, Turn turn){
@@ -52,38 +65,43 @@ public class Game {
         if(turn instanceof NormalTurn) {
             playedCard = turn.getPlayedCard();
             Log.info("Turn Card: " + playedCard.getCardColor()+ " / "+ playedCard.getCardValue());
-            currentPlayer.getHandDeck().remove(playedCard);
-            currentPlayer = getOtherPlayer(currentPlayer);
+            if(!isClientGame()){
+                currentPlayer.getHandDeck().remove(playedCard);
+                currentPlayer = getOtherPlayer(currentPlayer);
+            }
             changeState(GameState.AWAITING_RESPONSE);
         } else if(turn instanceof AnsagenTurn){
             if(!((AnsagenTurn) turn).isCallable())return;
             if(turn.getPlayedCard().getCardColor()==trumpf.getCardColor())currentPlayer.getCollectedDeck().addCallPoints(40);
             else currentPlayer.getCollectedDeck().addCallPoints(20);
             playedCard = turn.getPlayedCard();
-            currentPlayer.getHandDeck().remove(playedCard);
             boolean roundIsOver = isRoundOver();
-            currentPlayer = getOtherPlayer(currentPlayer);
+            if(!isClientGame()){
+                currentPlayer.getHandDeck().remove(playedCard);
+                currentPlayer = getOtherPlayer(currentPlayer);
+            }
             if(!roundIsOver)changeState(GameState.AWAITING_RESPONSE);
         }
+
     }
     public void respondOnTurn(Player player, Card responseCard){
         if(gameState!=GameState.AWAITING_RESPONSE || currentPlayer.getId()!=player.getId()||!player.getHandDeck().contains(responseCard))return;
         playedCard = responseCard;
         Log.info("Response Card: " + responseCard.getCardColor()+ " / "+ responseCard.getCardValue());
-        player.getHandDeck().remove(responseCard);
         boolean playedCardIsHigherThanResponse = playedCardIsHigherThanResponse(responseCard);
         CardPair cardPair = new CardPair(turn.getPlayedCard(), responseCard);
+        if(!isClientGame())player.getHandDeck().remove(responseCard);
         if(playedCardIsHigherThanResponse){
+            if(!isClientGame())currentPlayer = getOtherPlayer(currentPlayer);
             currentPlayer.getCollectedDeck().add(cardPair);
-            currentPlayer = getOtherPlayer(currentPlayer);
         }
         else {
             getOtherPlayer(currentPlayer).getCollectedDeck().add(cardPair);
         }
         boolean roundIsOver = isRoundOver();
         if(!roundIsOver){
-            if(drawDeck.getDrawDeck().size()>=2)drawOneCardEach();
-            changeState(GameState.AWAITING_TURN);}
+            changeState(GameState.DRAWING);
+        }
 
     }
 
@@ -185,17 +203,19 @@ public class Game {
     }
 
     public void updateGame(GameUpdate gameUpdate){
-        updatePlayers(gameUpdate.getPlayers());
+        if(updateListener!=null){
+            ArrayList<HandDeck> oldDecks= new ArrayList<>();
+            oldDecks.add(getCopyOfDeck(currentPlayer));
+            oldDecks.add(getCopyOfDeck(getOtherPlayer(currentPlayer)));
+            updateListener.updated(gameUpdate, oldDecks,gameState);
+        }
         this.currentPlayer = gameUpdate.getCurrentPlayer();
+        this.playedCard = gameUpdate.getPlayedCard();
+        updatePlayers(gameUpdate.getPlayers());
         this.turn = gameUpdate.getTurn();
         this.drawDeck = gameUpdate.getDrawDeck();
         this.trumpf = gameUpdate.getTrumpf();
-        this.playedCard = gameUpdate.getPlayedCard();
         this.gameState = gameUpdate.getGameState();
-
-        if(updateListener!=null){
-            updateListener.updated(gameUpdate);
-        }
     }
 
     public void updatePlayers(Player[] players){
@@ -207,6 +227,16 @@ public class Game {
                 }
             }
         }
+    }
+
+    public HandDeck getCopyOfDeck(Player player){
+        HandDeck deckToReturn = new HandDeck(new Card[5]);
+
+        for(Card card: player.getHandDeck().getDeck()){
+            deckToReturn.add(card);
+        }
+
+        return deckToReturn;
     }
 
     public Turn getTurn() {

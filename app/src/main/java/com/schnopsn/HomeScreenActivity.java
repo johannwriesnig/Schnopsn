@@ -1,13 +1,10 @@
 package com.schnopsn;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +26,7 @@ public class HomeScreenActivity extends AppCompatActivity {
 
         goBtn = findViewById(R.id.searchBtn);
         goBtn.setOnClickListener(v -> findGame());
-        intent = new Intent(this, GameView.class);
+        intent = new Intent(this, GameViewImpl.class);
         GameClient.getInstance().setGameInitListener(new GameInitListenerImpl());
 
     }

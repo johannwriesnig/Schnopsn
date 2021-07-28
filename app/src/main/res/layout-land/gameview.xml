@@ -4,16 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/woodbackground"
-    >
+    android:background="@drawable/woodbackground">
 
     <Button
         android:id="@+id/randomCard"
         android:layout_width="158dp"
         android:layout_height="46dp"
         android:layout_marginStart="52dp"
-        android:visibility="gone"
         android:text="Random Card"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -60,27 +59,42 @@
         android:layout_width="85dp"
         android:layout_height="125dp"
         android:layout_marginStart="36dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/cardImage2"
         app:layout_constraintHorizontal_bias="0.849"
-        app:layout_constraintStart_toStartOf="parent"
+
         tools:srcCompat="@drawable/herzass" />
 
     <ImageView
-        android:id="@+id/myPlayedCard"
+        android:id="@+id/myPlayedCardFront"
         android:layout_width="85dp"
         android:layout_height="125dp"
         android:scaleType="fitXY"
 
         app:layout_constraintBottom_toTopOf="@+id/cardImage2"
-        app:layout_constraintEnd_toStartOf="@+id/enemiesPlayedCard"
+        app:layout_constraintEnd_toStartOf="@+id/enemiesPlayedCardFront"
         app:layout_constraintHorizontal_bias="0.916"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enemyCardImage2"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
         app:layout_constraintVertical_bias="0.604"
         tools:srcCompat="@drawable/karobub" />
+
+    <ImageView
+        android:id="@+id/myPlayedCardBack"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:background="@drawable/cardback"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toStartOf="@+id/enemiesPlayedCardFront"
+        app:layout_constraintHorizontal_bias="0.916"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.604" />
 
     <ImageView
         android:id="@+id/trumpf"
@@ -91,22 +105,114 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@+id/cardImage2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enemyCardImage2"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
         app:layout_constraintVertical_bias="0.604"
         tools:srcCompat="@drawable/pikbub" />
 
     <ImageView
-        android:id="@+id/enemiesPlayedCard"
+        android:id="@+id/enemiesPlayedCardFront"
         android:layout_width="85dp"
         android:layout_height="125dp"
         android:layout_marginEnd="56dp"
         android:scaleType="fitXY"
+        android:rotationX="180"
 
         app:layout_constraintBottom_toTopOf="@+id/cardImage2"
         app:layout_constraintEnd_toStartOf="@+id/trumpf"
-        app:layout_constraintTop_toBottomOf="@+id/enemyCardImage2"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
         app:layout_constraintVertical_bias="0.604"
         tools:srcCompat="@drawable/karobub" />
+
+    <ImageView
+        android:id="@+id/enemiesPlayedCardBack"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="56dp"
+        android:background="@drawable/cardback"
+        android:rotationX="180"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.604" />
+
+    <ImageView
+        android:id="@+id/deckCard1"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="30dp"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.607"
+        android:background="@drawable/cardback" />
+
+    <ImageView
+        android:id="@+id/deckCard2Front"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="30dp"
+        android:rotationX="180"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.607"
+        tools:srcCompat="@drawable/karobub" />
+
+    <ImageView
+        android:id="@+id/deckCard2Back"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="30dp"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.607"
+        android:background="@drawable/cardback" />
+
+    <ImageView
+        android:id="@+id/deckCard3Front"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="30dp"
+        android:rotationX="180"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.607"
+        tools:srcCompat="@drawable/karobub" />
+
+    <ImageView
+        android:id="@+id/deckCard3Back"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="30dp"
+
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/cardImage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/trumpf"
+        app:layout_constraintTop_toBottomOf="@+id/enemyCardImageBack2"
+        app:layout_constraintVertical_bias="0.607"
+        android:background="@drawable/cardback" />
 
     <ImageView
         android:id="@+id/cardImage2"
@@ -153,57 +259,112 @@
         tools:srcCompat="@drawable/karozehn" />
 
     <ImageView
-        android:id="@+id/enemyCardImage1"
+        android:id="@+id/enemyCardImageBack1"
         android:layout_width="85dp"
-        android:layout_height="105dp"
-        android:layout_marginTop="0dp"
-        android:scaleType="fitXY"
-        app:layout_constraintEnd_toStartOf="@+id/enemyCardImage2"
-        app:layout_constraintHorizontal_bias="0.875"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="125dp"
+
+        android:layout_marginEnd="24dp"
         android:background="@drawable/cardback"
-        />
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack2"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/enemyCardImage2"
+        android:id="@+id/enemyCardImageFront1"
         android:layout_width="85dp"
-        android:layout_height="105dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0"
+        android:background="@drawable/cardback"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack2"
+        app:layout_constraintHorizontal_bias="0.871"
+
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemyCardImageBack2"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="24dp"
+        android:background="@drawable/cardback"
         android:scaleType="fitXY"
-        app:layout_constraintEnd_toStartOf="@+id/enemyCardImage3"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/cardback" />
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack3"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/enemyCardImage3"
+        android:id="@+id/enemyCardImageFront2"
         android:layout_width="85dp"
-        android:layout_height="105dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0"
+        android:background="@drawable/cardback"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemyCardImageBack3"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="24dp"
+        android:background="@drawable/cardback"
         android:scaleType="fitXY"
-        app:layout_constraintEnd_toStartOf="@+id/enemyCardImage4"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/cardback" />
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack4"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/enemyCardImage4"
+        android:id="@+id/enemyCardImageFront3"
         android:layout_width="85dp"
-        android:layout_height="105dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0"
+        android:background="@drawable/cardback"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack4"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemyCardImageBack4"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="24dp"
+        android:background="@drawable/cardback"
         android:scaleType="fitXY"
-        app:layout_constraintEnd_toStartOf="@+id/enemyCardImage5"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/cardback" />
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack5"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/enemyCardImage5"
+        android:id="@+id/enemyCardImageFront4"
         android:layout_width="85dp"
-        android:layout_height="105dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0"
+        android:background="@drawable/cardback"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemyCardImageBack5"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="32dp"
+        android:background="@drawable/cardback"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemyCardImageFront5"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginEnd="32dp"
+        android:alpha="0"
         android:background="@drawable/cardback"
         android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
@@ -213,13 +374,13 @@
         android:id="@+id/enemyNameView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="132dp"
         android:layout_marginEnd="20dp"
         android:text="name"
         android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/myPlayedCard"
+        app:layout_constraintEnd_toStartOf="@+id/myPlayedCardFront"
 
-        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintHorizontal_bias="0.774"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -232,10 +393,38 @@
         android:text="name"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/myPlayedCard"
+        app:layout_constraintEnd_toStartOf="@+id/myPlayedCardFront"
 
         app:layout_constraintHorizontal_bias="0.775"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/enemiesCollectedDeck"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="24dp"
+        android:rotation="-220"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack1"
+        app:layout_constraintHorizontal_bias="0.196"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/karobub" />
+
+    <ImageView
+        android:id="@+id/myCollectedDeck"
+        android:layout_width="85dp"
+        android:layout_height="125dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="124dp"
+        android:rotation="220"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/enemyCardImageBack1"
+        app:layout_constraintHorizontal_bias="0.196"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enemiesCollectedDeck"
+        app:layout_constraintVertical_bias="0.0"
+        tools:srcCompat="@drawable/karobub" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
