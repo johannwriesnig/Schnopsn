@@ -813,14 +813,11 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         Runnable animation = () -> {
             animateEnemyCardsToEnemiesStaple();
             animateMyCardsToEnemiesStaple();
-
-
         };
 
         handler.postDelayed(animation, DURATION_PLAY_CARD + 100);
-
-
     }
+
 
     public void animateEnemyCardsToEnemiesStaple() {
         float enemiesPlayedCardX = enemiesPlayedCardFront.getX();
@@ -967,6 +964,74 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
         handler.postDelayed(animation, DURATION_PLAY_CARD + 100);
     }
 
+    public void animateEnemyCardsToMyStaple() {
+        float enemiesPlayedCardX = enemiesPlayedCardFront.getX();
+        float enemiesPlayedCardY = enemiesPlayedCardFront.getY();
+        enemiesPlayedCardFront.animate()
+                .alpha(0f)
+                .rotationYBy(-180)
+                .rotationBy(40)
+                .x(myCollectedDeck.getX())
+                .y(myCollectedDeck.getY())
+                .setDuration(DURATION_COLLECT_CARDS)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation1) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation1) {
+                        enemiesPlayedCardFront.animate().alpha(0).rotationYBy(180).rotationBy(-40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
+                                .setDuration(0).setListener(null).start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation1) {
+                        Log.info("animation got cancelled");
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation1) {
+
+                    }
+                })
+
+                .start();
+
+        enemiesPlayedCardBack.animate()
+                .alpha(1)
+                .rotationYBy(-180)
+                .rotationBy(40)
+                .x(myCollectedDeck.getX())
+                .y(myCollectedDeck.getY())
+                .setDuration(DURATION_COLLECT_CARDS)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation1) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation1) {
+                        if (myCollectedDeck.getBackground() == null)
+                            myCollectedDeck.setBackgroundResource(R.drawable.cardback);
+                        enemiesPlayedCardBack.animate().alpha(0).rotationYBy(180).rotationBy(-40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
+                                .setDuration(0).setListener(null).start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation1) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation1) {
+
+                    }
+                }).start();
+    }
+
     public void animateMyCardsToMyStaple() {
         float myPlayedCardX = myPlayedCardFront.getX();
         float myPlayedCardY = myPlayedCardFront.getY();
@@ -1037,72 +1102,6 @@ public class GameViewImpl extends AppCompatActivity implements GameView {
 
     }
 
-    public void animateEnemyCardsToMyStaple() {
-        float enemiesPlayedCardX = enemiesPlayedCardFront.getX();
-        float enemiesPlayedCardY = enemiesPlayedCardFront.getY();
-        enemiesPlayedCardFront.animate()
-                .alpha(0f)
-                .rotationYBy(-180)
-                .rotationBy(40)
-                .x(myCollectedDeck.getX())
-                .y(myCollectedDeck.getY())
-                .setDuration(DURATION_COLLECT_CARDS)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation1) {
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation1) {
-                        enemiesPlayedCardFront.animate().alpha(0).rotationYBy(180).rotationBy(-40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
-                                .setDuration(0).setListener(null).start();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation1) {
-                        Log.info("animation got cancelled");
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation1) {
-
-                    }
-                })
-
-                .start();
-
-        enemiesPlayedCardBack.animate()
-                .alpha(1)
-                .rotationYBy(-180)
-                .rotationBy(40)
-                .x(myCollectedDeck.getX())
-                .y(myCollectedDeck.getY())
-                .setDuration(DURATION_COLLECT_CARDS)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation1) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation1) {
-                        if (myCollectedDeck.getBackground() == null)
-                            myCollectedDeck.setBackgroundResource(R.drawable.cardback);
-                        enemiesPlayedCardBack.animate().alpha(0).rotationYBy(180).rotationBy(-40).x(enemiesPlayedCardX).y(enemiesPlayedCardY)
-                                .setDuration(0).setListener(null).start();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation1) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation1) {
-
-                    }
-                }).start();
-    }
 
 }
