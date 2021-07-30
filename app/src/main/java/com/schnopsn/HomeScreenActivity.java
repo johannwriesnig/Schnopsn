@@ -54,7 +54,7 @@ public class HomeScreenActivity extends AppCompatActivity {
             thread.start();
 
 
-            waitFor7Seconds();
+            waitWhileSearching();
 
             return "Client initialized";
         }
@@ -73,9 +73,9 @@ public class HomeScreenActivity extends AppCompatActivity {
         }
     }
 
-    public void waitFor7Seconds(){
+    public void waitWhileSearching(){
         try {
-            Thread.sleep(20000);
+            Thread.sleep(10000000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
