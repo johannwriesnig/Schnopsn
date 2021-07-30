@@ -24,6 +24,7 @@ public class Controller {
     private UpdateListenerImpl updateListener;
     private Card cardToDraw1;
     private Card cardToDraw2;
+    private boolean isLastDraw=false;
 
 
     public Controller(GameView gameView) {
@@ -52,9 +53,13 @@ public class Controller {
 
 
         if (previousState == GameState.AWAITING_TURN && gameUpdate.getGameState() == GameState.AWAITING_RESPONSE) {
-            cardToDraw1 = game.getDrawDeck().getDrawDeck().get(0);
-            cardToDraw2 = game.getDrawDeck().getDrawDeck().get(1);
-            gameView.initDrawCards(cardToDraw1,cardToDraw2);
+            int drawDeckSize = game.getDrawDeck().getDrawDeck().size();
+            if(drawDeckSize==2)isLastDraw=true;
+            if(drawDeckSize>=2){
+                cardToDraw1 = game.getDrawDeck().getDrawDeck().get(0);
+                cardToDraw2 = game.getDrawDeck().getDrawDeck().get(1);
+                gameView.initDrawCards(cardToDraw1,cardToDraw2);
+            }
             computeTurn();
         } else if(previousState == GameState.AWAITING_RESPONSE && gameUpdate.getGameState() == GameState.DRAWING){
             computeTurn();
